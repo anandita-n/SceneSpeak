@@ -7,6 +7,22 @@ const categoriesEl = document.getElementById("categories");
 const rejectedEl = document.getElementById("rejected");
 const photoInput = document.getElementById("photo");
 const preview = document.getElementById("preview");
+const apiKeyInput = document.getElementById("gemini_api_key");
+
+const API_KEY_STORAGE_KEY = "scenespeak_gemini_api_key";
+
+// Remember the key in this browser only, so it doesn't need retyping every
+// time — never sent anywhere except this app's own backend, on submit.
+const savedKey = localStorage.getItem(API_KEY_STORAGE_KEY);
+if (savedKey) apiKeyInput.value = savedKey;
+
+apiKeyInput.addEventListener("input", () => {
+  if (apiKeyInput.value) {
+    localStorage.setItem(API_KEY_STORAGE_KEY, apiKeyInput.value);
+  } else {
+    localStorage.removeItem(API_KEY_STORAGE_KEY);
+  }
+});
 
 const CATEGORY_LABELS = {
   core: "Core Words",

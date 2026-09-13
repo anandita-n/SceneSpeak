@@ -52,6 +52,7 @@ async def generate_board(
     photo: UploadFile = File(..., description="A real photo of the scene/activity."),
     scenario: str | None = Form(None, description="Optional context, e.g. 'practicing at the playground'."),
     child_id: str = Form("default", description="Identifies the child, so vocabulary stays consistent across their boards."),
+    gemini_api_key: str | None = Form(None, description="Optional — overrides GEMINI_API_KEY from the environment for this request."),
 ):
     if not photo.content_type or not photo.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Uploaded file must be an image.")
@@ -72,6 +73,7 @@ async def generate_board(
             scenario,
             retrieved_vocabulary=retrieved_vocabulary,
             child_history=child_history,
+            api_key=gemini_api_key or None,
         )
     except RuntimeError as exc:
         # e.g. missing GEMINI_API_KEY — surface the real reason as JSON so

@@ -23,10 +23,13 @@ class VocabularySet(BaseModel):
     prepositions: list[str] = Field(default_factory=list, description="Spatial/relational words relevant to the scene")
 
 
-def _get_model():
-    api_key = os.environ.get("GEMINI_API_KEY")
+def _get_model(api_key: str | None = None):
+    api_key = api_key or os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        raise RuntimeError("GEMINI_API_KEY is not set. Copy .env.example to .env and add your key.")
+        raise RuntimeError(
+            "No Gemini API key found. Either paste one into the API key field in the "
+            "UI, or copy .env.example to .env and set GEMINI_API_KEY there."
+        )
     genai.configure(api_key=api_key)
     return genai.GenerativeModel(_MODEL_NAME)
 
@@ -77,8 +80,9 @@ def generate_vocabulary(
     scenario: str | None = None,
     retrieved_vocabulary: list[dict] | None = None,
     child_history: list[str] | None = None,
+    api_key: str | None = None,
 ) -> VocabularySet:
-    model = _get_model()
+    model = _get_model(api_key)
     prompt = _build_prompt(caption, scenario, retrieved_vocabulary, child_history)
     response = model.generate_content(prompt)
     text = response.text.strip()

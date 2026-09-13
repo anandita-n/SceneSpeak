@@ -30,6 +30,12 @@
             <input type="text" id="child_id" name="child_id" placeholder="e.g. Alex" value="default" />
           </div>
         </div>
+        <div class="form-row">
+          <div class="field">
+            <label for="gemini_api_key">Gemini API key <span class="hint">(saved in this browser only — skip if set in .env)</span></label>
+            <input type="password" id="gemini_api_key" name="gemini_api_key" placeholder="AIza..." autocomplete="off" />
+          </div>
+        </div>
         <button type="submit" id="submit-btn">Create board</button>
         <div class="status" id="status"></div>
       </form>

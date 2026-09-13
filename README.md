@@ -50,8 +50,11 @@ python scripts/evaluate_verification.py   # reports precision/recall/accuracy ac
 ```bash
 python -m venv .venv && .venv\Scripts\activate      # Windows
 pip install -r requirements.txt
-copy .env.example .env                              # then add your GEMINI_API_KEY
 ```
+
+You need a [Gemini API key](https://aistudio.google.com/apikey). Either:
+- copy `.env.example` to `.env` and set `GEMINI_API_KEY` there, **or**
+- paste it into the "Gemini API key" field on the web UI itself — it's saved in your browser's local storage (not committed, not sent anywhere but this app's own backend) so you only enter it once per browser.
 
 ## Run
 ```bash

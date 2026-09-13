@@ -75,6 +75,12 @@ main {
   color: var(--muted);
 }
 
+.field label .hint {
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
 input[type="text"],
 input[type="file"] {
   width: 100%;
