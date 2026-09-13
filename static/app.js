@@ -8,6 +8,15 @@ const CATEGORY_LABELS = {
 const API_KEY_STORAGE_KEY = "scenespeak_gemini_api_key";
 const CHILD_STORAGE_KEY = "scenespeak_last_child";
 
+// ---------------- Icons ----------------
+function hydrateIcons(root = document) {
+  root.querySelectorAll("[data-icon]").forEach((el) => {
+    const render = Icon[el.dataset.icon];
+    if (render) el.innerHTML = render();
+  });
+}
+hydrateIcons();
+
 // ---------------- View routing ----------------
 const views = {
   home: document.getElementById("view-home"),
@@ -33,6 +42,7 @@ const statusEl = document.getElementById("status");
 const submitBtn = document.getElementById("submit-btn");
 const photoInput = document.getElementById("photo");
 const preview = document.getElementById("preview");
+const fileDropLabel = document.getElementById("file-drop-label");
 const apiKeyInput = document.getElementById("gemini_api_key");
 const childInput = document.getElementById("child_id");
 
@@ -57,10 +67,12 @@ photoInput.addEventListener("change", () => {
   const file = photoInput.files[0];
   if (!file) {
     preview.style.display = "none";
+    fileDropLabel.textContent = "Choose a photo";
     return;
   }
   preview.src = URL.createObjectURL(file);
   preview.style.display = "block";
+  fileDropLabel.textContent = file.name;
 });
 
 form.addEventListener("submit", async (event) => {
@@ -124,7 +136,7 @@ function renderTile(entry, category) {
   } else {
     const placeholder = document.createElement("span");
     placeholder.className = "placeholder";
-    placeholder.textContent = "🔤";
+    placeholder.innerHTML = Icon.text();
     btn.appendChild(placeholder);
   }
 
@@ -136,7 +148,7 @@ function renderTile(entry, category) {
   const removeBtn = document.createElement("button");
   removeBtn.type = "button";
   removeBtn.className = "remove-tile";
-  removeBtn.textContent = "✕";
+  removeBtn.innerHTML = Icon.close();
   removeBtn.title = `Remove "${entry.word}" from this board`;
   removeBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -154,7 +166,8 @@ function renderBoard(data) {
   categoriesEl.innerHTML = "";
   boardSection.classList.remove("editing");
   editToggle.classList.remove("active");
-  editToggle.textContent = "✏️ Edit";
+  editToggle.innerHTML = `<span data-icon="edit"></span>Edit`;
+  hydrateIcons(editToggle);
 
   for (const category of ["core", "objects", "descriptors", "prepositions"]) {
     const entries = data[category] || [];
@@ -187,7 +200,8 @@ function renderBoard(data) {
 editToggle.addEventListener("click", () => {
   const nowEditing = boardSection.classList.toggle("editing");
   editToggle.classList.toggle("active", nowEditing);
-  editToggle.textContent = nowEditing ? "✅ Done" : "✏️ Edit";
+  editToggle.innerHTML = nowEditing ? `<span data-icon="check"></span>Done` : `<span data-icon="edit"></span>Edit`;
+  hydrateIcons(editToggle);
 });
 
 // ---------------- Library view ----------------

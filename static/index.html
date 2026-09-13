@@ -4,21 +4,27 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SceneSpeak</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <!-- HOME -->
   <section id="view-home" class="view">
     <div class="home-wrap">
-      <h1>🗣️ SceneSpeak</h1>
+      <div class="wordmark">
+        <span class="wordmark-icon" aria-hidden="true"><span></span><span></span></span>
+        <span class="wordmark-text">Scene<b>Speak</b></span>
+      </div>
       <p class="subtitle">AAC communication boards, generated from a real photo.</p>
       <div class="home-cards">
         <button type="button" class="home-card" data-nav="create">
-          <span class="home-icon">📷</span>
+          <span class="home-icon" data-icon="camera"></span>
           <span>Create a Board</span>
         </button>
         <button type="button" class="home-card" data-nav="library">
-          <span class="home-icon">📚</span>
+          <span class="home-icon" data-icon="book"></span>
           <span>My Library</span>
         </button>
       </div>
@@ -28,15 +34,20 @@
   <!-- CREATE -->
   <section id="view-create" class="view" hidden>
     <div class="topbar">
-      <button type="button" class="icon-btn" data-nav="home">🏠 Home</button>
+      <button type="button" class="icon-btn" data-nav="home"><span data-icon="home"></span>Home</button>
       <h2>Create a Board</h2>
+      <span class="topbar-spacer"></span>
     </div>
     <div class="card">
       <form id="board-form">
         <div class="form-row">
           <div class="field">
             <label for="photo">Photo of the scene</label>
-            <input type="file" id="photo" name="photo" accept="image/*" required />
+            <label class="file-drop" id="file-drop" for="photo">
+              <span class="file-drop-icon" data-icon="upload"></span>
+              <span id="file-drop-label">Choose a photo</span>
+            </label>
+            <input type="file" id="photo" name="photo" accept="image/*" required hidden />
             <img id="preview" alt="Preview of the uploaded photo" />
           </div>
           <div class="field">
@@ -63,9 +74,9 @@
   <!-- BOARD -->
   <section id="view-board" class="view" hidden>
     <div class="topbar">
-      <button type="button" class="icon-btn" data-nav="home">🏠 Home</button>
+      <button type="button" class="icon-btn" data-nav="home"><span data-icon="home"></span>Home</button>
       <h2>Board</h2>
-      <button type="button" class="icon-btn" id="edit-toggle">✏️ Edit</button>
+      <button type="button" class="icon-btn" id="edit-toggle"><span data-icon="edit"></span>Edit</button>
     </div>
     <div class="board-layout">
       <div class="board-photo-pane">
@@ -82,13 +93,15 @@
   <!-- LIBRARY -->
   <section id="view-library" class="view" hidden>
     <div class="topbar">
-      <button type="button" class="icon-btn" data-nav="home">🏠 Home</button>
+      <button type="button" class="icon-btn" data-nav="home"><span data-icon="home"></span>Home</button>
       <h2>My Library</h2>
+      <span class="topbar-spacer"></span>
     </div>
     <div id="library-grid" class="library-grid"></div>
-    <p id="library-empty" class="status" hidden>No boards yet — create your first one!</p>
+    <p id="library-empty" class="status" hidden>No boards yet — create your first one.</p>
   </section>
 
+  <script src="/static/icons.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>
