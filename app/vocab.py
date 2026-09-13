@@ -31,16 +31,36 @@ def _get_model():
     return genai.GenerativeModel(_MODEL_NAME)
 
 
-def _build_prompt(caption: str, scenario: str | None) -> str:
+def _build_prompt(
+    caption: str,
+    scenario: str | None,
+    retrieved_vocabulary: list[dict] | None = None,
+    child_history: list[str] | None = None,
+) -> str:
     context = f'Scene description: "{caption}"'
     if scenario:
         context += f'\nActivity/context provided by the caregiver: "{scenario}"'
+
+    grounding = ""
+    if retrieved_vocabulary:
+        word_list = ", ".join(sorted({e["word"] for e in retrieved_vocabulary}))
+        grounding += (
+            "\n\nPrefer words from this standardized AAC vocabulary list when they fit "
+            f"the scene (only include ones that are actually relevant, don't force all of them): {word_list}"
+        )
+    if child_history:
+        grounding += (
+            "\n\nThis child has previously used these words on other boards — reuse the "
+            f"same wording for any that fit this scene, instead of inventing new phrasing "
+            f"for the same concept: {', '.join(child_history)}"
+        )
+
     return f"""You support a speech-language pathologist building an AAC
 (Augmentative and Alternative Communication) topic board for a nonverbal or
 minimally-verbal child. Given the scene below, suggest vocabulary the child
 could use to talk about it during a language-learning activity.
 
-{context}
+{context}{grounding}
 
 Return between 6 and 10 words per category. Core words should be common,
 reusable, high-frequency words a child would use across many situations
@@ -52,9 +72,14 @@ Respond with only a JSON object shaped exactly like this, no other text:
 {{"core": [...], "objects": [...], "descriptors": [...], "prepositions": [...]}}"""
 
 
-def generate_vocabulary(caption: str, scenario: str | None = None) -> VocabularySet:
+def generate_vocabulary(
+    caption: str,
+    scenario: str | None = None,
+    retrieved_vocabulary: list[dict] | None = None,
+    child_history: list[str] | None = None,
+) -> VocabularySet:
     model = _get_model()
-    prompt = _build_prompt(caption, scenario)
+    prompt = _build_prompt(caption, scenario, retrieved_vocabulary, child_history)
     response = model.generate_content(prompt)
     text = response.text.strip()
     # Strip accidental markdown code fences before parsing.

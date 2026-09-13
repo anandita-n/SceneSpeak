@@ -4,5 +4,6 @@ __pycache__/
 .env
 data/uploads/
 data/*.db
+data/chroma/
 .DS_Store
 server.log
