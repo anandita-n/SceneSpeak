@@ -58,8 +58,14 @@ You need a [Gemini API key](https://aistudio.google.com/apikey). Either:
 
 ## Run
 ```bash
-uvicorn app.main:app --reload
+python run.py
 ```
+
+(Don't run plain `uvicorn app.main:app --reload` — the app writes to
+`data/` on every board generation, which makes uvicorn's default
+auto-reloader restart the whole server mid-request, and the browser just
+shows "Failed to fetch" with no explanation. `run.py` excludes `data/`
+from the reload watch so this doesn't happen.)
 
 ## Try it
 ```bash
