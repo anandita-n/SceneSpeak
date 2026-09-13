@@ -1,5 +1,5 @@
-"""SceneSpeak — Phase 1: photo in, BLIP caption + LLM-generated AAC
-vocabulary out. Run with: uvicorn app.main:app --reload
+"""SceneSpeak — photo in, a symbol-mapped, RAG-grounded AAC board out.
+Run with: uvicorn app.main:app --reload
 """
 
 import io
@@ -7,19 +7,25 @@ import io
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile, Form
 from PIL import Image
+from pydantic import BaseModel
 
 from app.captioning import generate_caption
 from app.history import add_to_history, get_child_history
 from app.rag import retrieve_vocabulary_context
-from app.vocab import VocabularySet, generate_vocabulary
+from app.symbols import SymbolEntry, map_words_to_symbols
+from app.vocab import generate_vocabulary
 
 load_dotenv()
 
-app = FastAPI(title="SceneSpeak", version="0.2.0")
+app = FastAPI(title="SceneSpeak", version="0.3.0")
 
 
-class BoardResponse(VocabularySet):
+class BoardResponse(BaseModel):
     caption: str
+    core: list[SymbolEntry]
+    objects: list[SymbolEntry]
+    descriptors: list[SymbolEntry]
+    prepositions: list[SymbolEntry]
 
 
 @app.get("/health")
@@ -52,7 +58,14 @@ async def generate_board(
         retrieved_vocabulary=retrieved_vocabulary,
         child_history=child_history,
     )
+    vocab_dict = vocabulary.model_dump()
 
-    add_to_history(child_id, vocabulary.model_dump())
+    add_to_history(child_id, vocab_dict)
 
-    return BoardResponse(caption=caption, **vocabulary.model_dump())
+    return BoardResponse(
+        caption=caption,
+        core=map_words_to_symbols(vocab_dict["core"]),
+        objects=map_words_to_symbols(vocab_dict["objects"]),
+        descriptors=map_words_to_symbols(vocab_dict["descriptors"]),
+        prepositions=map_words_to_symbols(vocab_dict["prepositions"]),
+    )

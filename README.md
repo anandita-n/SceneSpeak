@@ -9,24 +9,26 @@ vocabulary (e.g. QuickPic, CHI 2024) with an added reliability layer:
 generated vocabulary is cross-checked against the actual photo before it
 reaches the user.
 
-## Status: Phase 2 (of 6) — see `PLAN.md`
+## Status: Phase 3 (of 6) — see `PLAN.md`
 
-Working right now: upload a photo → BLIP captions it → the most relevant
-entries are retrieved from a curated AAC vocabulary corpus (ChromaDB) and
-combined with that child's prior vocabulary history (SQLite) → an LLM
-generates categorized AAC vocabulary (core words, objects, descriptors,
-prepositions) grounded in all of that, not just the raw caption.
+Working right now: upload a photo → BLIP captions it → relevant vocabulary
+is retrieved from a curated AAC corpus (ChromaDB) and combined with that
+child's prior history (SQLite) → an LLM generates categorized AAC
+vocabulary grounded in all of that → each word is mapped to a real
+ARASAAC pictogram (falling back to text-only when no good symbol exists,
+rather than showing a wrong one).
 
-Not yet built: symbol mapping to an existing AAC symbol set (Phase 3),
-BLIP/CLIP-based verification of generated vocabulary (Phase 4), TTS +
-persistence polish (Phase 5), frontend + deployment (Phase 6).
+Not yet built: BLIP/CLIP-based verification of generated vocabulary
+(Phase 4), TTS + persistence polish (Phase 5), frontend + deployment
+(Phase 6).
 
-## Stack (Phase 1–2)
+## Stack (Phase 1–3)
 - FastAPI backend
 - BLIP (`Salesforce/blip-image-captioning-base`) for scene captioning
 - ChromaDB for RAG retrieval over the AAC vocabulary corpus (`data/`)
 - SQLite for per-child vocabulary history
 - Gemini API for vocabulary generation
+- ARASAAC public API for AAC symbol mapping
 
 ## Setup
 ```bash
