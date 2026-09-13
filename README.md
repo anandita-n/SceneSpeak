@@ -9,7 +9,14 @@ vocabulary (e.g. QuickPic, CHI 2024) with an added reliability layer:
 generated vocabulary is cross-checked against the actual photo before it
 reaches the user.
 
-## Status: Phase 4 (of 6) — see `PLAN.md`
+## Status: Phase 4 done, Phase 6 (frontend) started — see `PLAN.md`
+
+Open http://127.0.0.1:8000/ (not just `/docs`) for the actual UI: upload a
+photo, get back a board grouped by part of speech, tap any symbol to hear
+it spoken (via the browser's built-in speech synthesis — no backend TTS
+service needed for this), with a transparent note about anything the
+verification layer filtered out.
+
 
 Working right now: upload a photo → BLIP captions it → relevant vocabulary
 is retrieved from a curated AAC corpus (ChromaDB) and combined with that
@@ -24,7 +31,7 @@ symbol exists, rather than showing a wrong one).
 Not yet built: TTS + persistence polish (Phase 5), frontend + deployment
 (Phase 6).
 
-## Stack (Phase 1–4)
+## Stack (Phase 1–4, 6)
 - FastAPI backend
 - BLIP (`Salesforce/blip-image-captioning-base`) for scene captioning
 - ChromaDB for RAG retrieval over the AAC vocabulary corpus (`data/`)

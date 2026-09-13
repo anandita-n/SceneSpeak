@@ -4,8 +4,12 @@ board out. Run with: uvicorn app.main:app --reload
 
 import io
 
+from pathlib import Path
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile, Form
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from PIL import Image
 from pydantic import BaseModel
 
@@ -18,7 +22,15 @@ from app.vocab import generate_vocabulary
 
 load_dotenv()
 
-app = FastAPI(title="SceneSpeak", version="0.4.0")
+app = FastAPI(title="SceneSpeak", version="0.5.0")
+
+STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+
+@app.get("/")
+def index():
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 class BoardResponse(BaseModel):

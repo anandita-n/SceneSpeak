@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SceneSpeak</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>🗣️ SceneSpeak</h1>
+    <p>Generate an AAC communication board from a real photo.</p>
+  </header>
+
+  <main>
+    <section class="card" id="create-section">
+      <form id="board-form">
+        <div class="form-row">
+          <div class="field">
+            <label for="photo">Photo of the scene</label>
+            <input type="file" id="photo" name="photo" accept="image/*" required />
+            <img id="preview" alt="Preview of the uploaded photo" />
+          </div>
+          <div class="field">
+            <label for="scenario">Activity / context (optional)</label>
+            <input type="text" id="scenario" name="scenario" placeholder="e.g. practicing at the playground" />
+          </div>
+          <div class="field">
+            <label for="child_id">Child</label>
+            <input type="text" id="child_id" name="child_id" placeholder="e.g. Alex" value="default" />
+          </div>
+        </div>
+        <button type="submit" id="submit-btn">Create board</button>
+        <div class="status" id="status"></div>
+      </form>
+    </section>
+
+    <section class="card" id="board-section">
+      <p id="caption-line"></p>
+      <div id="categories"></div>
+      <div class="rejected" id="rejected" hidden></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
