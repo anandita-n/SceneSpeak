@@ -66,12 +66,20 @@ async def generate_board(
     retrieved_vocabulary = retrieve_vocabulary_context(caption, scenario)
     child_history = get_child_history(child_id)
 
-    vocabulary = generate_vocabulary(
-        caption,
-        scenario,
-        retrieved_vocabulary=retrieved_vocabulary,
-        child_history=child_history,
-    )
+    try:
+        vocabulary = generate_vocabulary(
+            caption,
+            scenario,
+            retrieved_vocabulary=retrieved_vocabulary,
+            child_history=child_history,
+        )
+    except RuntimeError as exc:
+        # e.g. missing GEMINI_API_KEY — surface the real reason as JSON so
+        # the frontend can show it, instead of a generic 500 with no body.
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Vocabulary generation failed: {exc}") from exc
+
     vocab_dict = vocabulary.model_dump()
 
     # Verify only the "objects" category — core vocabulary and prepositions
