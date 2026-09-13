@@ -1,5 +1,5 @@
-"""SceneSpeak — photo in, a symbol-mapped, RAG-grounded AAC board out.
-Run with: uvicorn app.main:app --reload
+"""SceneSpeak — photo in, a verified, symbol-mapped, RAG-grounded AAC
+board out. Run with: uvicorn app.main:app --reload
 """
 
 import io
@@ -13,11 +13,12 @@ from app.captioning import generate_caption
 from app.history import add_to_history, get_child_history
 from app.rag import retrieve_vocabulary_context
 from app.symbols import SymbolEntry, map_words_to_symbols
+from app.verification import verify_objects
 from app.vocab import generate_vocabulary
 
 load_dotenv()
 
-app = FastAPI(title="SceneSpeak", version="0.3.0")
+app = FastAPI(title="SceneSpeak", version="0.4.0")
 
 
 class BoardResponse(BaseModel):
@@ -26,6 +27,7 @@ class BoardResponse(BaseModel):
     objects: list[SymbolEntry]
     descriptors: list[SymbolEntry]
     prepositions: list[SymbolEntry]
+    rejected_objects: list[dict]  # words the LLM suggested that verification filtered out, with their CLIP scores
 
 
 @app.get("/health")
@@ -60,12 +62,21 @@ async def generate_board(
     )
     vocab_dict = vocabulary.model_dump()
 
+    # Verify only the "objects" category — core vocabulary and prepositions
+    # aren't things a photo depicts, so scoring them against image
+    # similarity wouldn't mean anything (see app/verification.py).
+    object_scores = verify_objects(image, vocab_dict["objects"])
+    verified_objects = [r["word"] for r in object_scores if r["passed"]]
+    rejected_objects = [r for r in object_scores if not r["passed"]]
+    vocab_dict["objects"] = verified_objects
+
     add_to_history(child_id, vocab_dict)
 
     return BoardResponse(
         caption=caption,
         core=map_words_to_symbols(vocab_dict["core"]),
-        objects=map_words_to_symbols(vocab_dict["objects"]),
+        objects=map_words_to_symbols(verified_objects),
         descriptors=map_words_to_symbols(vocab_dict["descriptors"]),
         prepositions=map_words_to_symbols(vocab_dict["prepositions"]),
+        rejected_objects=rejected_objects,
     )

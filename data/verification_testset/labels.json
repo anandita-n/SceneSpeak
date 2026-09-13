@@ -1,0 +1,107 @@
+[
+  {
+    "image": "mountain_scene.png",
+    "word": "mountain",
+    "expected_present": true
+  },
+  {
+    "image": "mountain_scene.png",
+    "word": "sun",
+    "expected_present": true
+  },
+  {
+    "image": "mountain_scene.png",
+    "word": "grass",
+    "expected_present": true
+  },
+  {
+    "image": "mountain_scene.png",
+    "word": "sky",
+    "expected_present": true
+  },
+  {
+    "image": "mountain_scene.png",
+    "word": "swing",
+    "expected_present": false
+  },
+  {
+    "image": "mountain_scene.png",
+    "word": "car",
+    "expected_present": false
+  },
+  {
+    "image": "mountain_scene.png",
+    "word": "book",
+    "expected_present": false
+  },
+  {
+    "image": "beach_scene.png",
+    "word": "water",
+    "expected_present": true
+  },
+  {
+    "image": "beach_scene.png",
+    "word": "sand",
+    "expected_present": true
+  },
+  {
+    "image": "beach_scene.png",
+    "word": "umbrella",
+    "expected_present": true
+  },
+  {
+    "image": "beach_scene.png",
+    "word": "sun",
+    "expected_present": true
+  },
+  {
+    "image": "beach_scene.png",
+    "word": "mountain",
+    "expected_present": false
+  },
+  {
+    "image": "beach_scene.png",
+    "word": "dog",
+    "expected_present": false
+  },
+  {
+    "image": "beach_scene.png",
+    "word": "bicycle",
+    "expected_present": false
+  },
+  {
+    "image": "playground_scene.png",
+    "word": "swing",
+    "expected_present": true
+  },
+  {
+    "image": "playground_scene.png",
+    "word": "slide",
+    "expected_present": true
+  },
+  {
+    "image": "playground_scene.png",
+    "word": "grass",
+    "expected_present": true
+  },
+  {
+    "image": "playground_scene.png",
+    "word": "sky",
+    "expected_present": true
+  },
+  {
+    "image": "playground_scene.png",
+    "word": "water",
+    "expected_present": false
+  },
+  {
+    "image": "playground_scene.png",
+    "word": "pizza",
+    "expected_present": false
+  },
+  {
+    "image": "playground_scene.png",
+    "word": "computer",
+    "expected_present": false
+  }
+]

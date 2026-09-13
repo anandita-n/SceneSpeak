@@ -9,26 +9,35 @@ vocabulary (e.g. QuickPic, CHI 2024) with an added reliability layer:
 generated vocabulary is cross-checked against the actual photo before it
 reaches the user.
 
-## Status: Phase 3 (of 6) — see `PLAN.md`
+## Status: Phase 4 (of 6) — see `PLAN.md`
 
 Working right now: upload a photo → BLIP captions it → relevant vocabulary
 is retrieved from a curated AAC corpus (ChromaDB) and combined with that
 child's prior history (SQLite) → an LLM generates categorized AAC
-vocabulary grounded in all of that → each word is mapped to a real
-ARASAAC pictogram (falling back to text-only when no good symbol exists,
-rather than showing a wrong one).
+vocabulary grounded in all of that → generated **objects** are
+independently verified against the real photo with CLIP, filtering out
+anything that doesn't actually match (measured **90.9% precision / 83.3%
+recall** — see `scripts/evaluate_verification.py`) → surviving words are
+mapped to real ARASAAC pictograms (falling back to text-only when no good
+symbol exists, rather than showing a wrong one).
 
-Not yet built: BLIP/CLIP-based verification of generated vocabulary
-(Phase 4), TTS + persistence polish (Phase 5), frontend + deployment
+Not yet built: TTS + persistence polish (Phase 5), frontend + deployment
 (Phase 6).
 
-## Stack (Phase 1–3)
+## Stack (Phase 1–4)
 - FastAPI backend
 - BLIP (`Salesforce/blip-image-captioning-base`) for scene captioning
 - ChromaDB for RAG retrieval over the AAC vocabulary corpus (`data/`)
 - SQLite for per-child vocabulary history
 - Gemini API for vocabulary generation
+- CLIP (`openai/clip-vit-base-patch32`) for vision-language verification
 - ARASAAC public API for AAC symbol mapping
+
+## Evaluating the verification layer
+```bash
+python scripts/build_test_images.py       # builds the labeled synthetic test set
+python scripts/evaluate_verification.py   # reports precision/recall/accuracy across thresholds
+```
 
 ## Setup
 ```bash
