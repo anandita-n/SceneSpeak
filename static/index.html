@@ -7,13 +7,31 @@
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <header>
-    <h1>🗣️ SceneSpeak</h1>
-    <p>Generate an AAC communication board from a real photo.</p>
-  </header>
+  <!-- HOME -->
+  <section id="view-home" class="view">
+    <div class="home-wrap">
+      <h1>🗣️ SceneSpeak</h1>
+      <p class="subtitle">AAC communication boards, generated from a real photo.</p>
+      <div class="home-cards">
+        <button type="button" class="home-card" data-nav="create">
+          <span class="home-icon">📷</span>
+          <span>Create a Board</span>
+        </button>
+        <button type="button" class="home-card" data-nav="library">
+          <span class="home-icon">📚</span>
+          <span>My Library</span>
+        </button>
+      </div>
+    </div>
+  </section>
 
-  <main>
-    <section class="card" id="create-section">
+  <!-- CREATE -->
+  <section id="view-create" class="view" hidden>
+    <div class="topbar">
+      <button type="button" class="icon-btn" data-nav="home">🏠 Home</button>
+      <h2>Create a Board</h2>
+    </div>
+    <div class="card">
       <form id="board-form">
         <div class="form-row">
           <div class="field">
@@ -39,14 +57,37 @@
         <button type="submit" id="submit-btn">Create board</button>
         <div class="status" id="status"></div>
       </form>
-    </section>
+    </div>
+  </section>
 
-    <section class="card" id="board-section">
-      <p id="caption-line"></p>
-      <div id="categories"></div>
-      <div class="rejected" id="rejected" hidden></div>
-    </section>
-  </main>
+  <!-- BOARD -->
+  <section id="view-board" class="view" hidden>
+    <div class="topbar">
+      <button type="button" class="icon-btn" data-nav="home">🏠 Home</button>
+      <h2>Board</h2>
+      <button type="button" class="icon-btn" id="edit-toggle">✏️ Edit</button>
+    </div>
+    <div class="board-layout">
+      <div class="board-photo-pane">
+        <img id="board-photo" alt="The scene this board was generated from" />
+        <p id="caption-line"></p>
+      </div>
+      <div class="board-symbols-pane">
+        <div id="categories"></div>
+        <div class="rejected" id="rejected" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIBRARY -->
+  <section id="view-library" class="view" hidden>
+    <div class="topbar">
+      <button type="button" class="icon-btn" data-nav="home">🏠 Home</button>
+      <h2>My Library</h2>
+    </div>
+    <div id="library-grid" class="library-grid"></div>
+    <p id="library-empty" class="status" hidden>No boards yet — create your first one!</p>
+  </section>
 
   <script src="/static/app.js"></script>
 </body>

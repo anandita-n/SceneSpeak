@@ -1,8 +1,9 @@
 """SceneSpeak — photo in, a verified, symbol-mapped, RAG-grounded AAC
-board out. Run with: uvicorn app.main:app --reload
+board out. Run with: python run.py
 """
 
 import io
+import mimetypes
 
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from PIL import Image
 from pydantic import BaseModel
 
+from app.boards import UPLOADS_DIR, get_board, list_boards, save_board
 from app.captioning import generate_caption
 from app.history import add_to_history, get_child_history
 from app.rag import retrieve_vocabulary_context
@@ -22,10 +24,11 @@ from app.vocab import generate_vocabulary
 
 load_dotenv()
 
-app = FastAPI(title="SceneSpeak", version="0.5.0")
+app = FastAPI(title="SceneSpeak", version="0.6.0")
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
 
 @app.get("/")
@@ -33,7 +36,7 @@ def index():
     return FileResponse(STATIC_DIR / "index.html")
 
 
-class BoardResponse(BaseModel):
+class BoardData(BaseModel):
     caption: str
     core: list[SymbolEntry]
     objects: list[SymbolEntry]
@@ -42,9 +45,28 @@ class BoardResponse(BaseModel):
     rejected_objects: list[dict]  # words the LLM suggested that verification filtered out, with their CLIP scores
 
 
+class BoardResponse(BoardData):
+    id: str
+    image_url: str
+    created_at: str
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/boards")
+def get_boards(child_id: str = "default"):
+    return list_boards(child_id)
+
+
+@app.get("/boards/{board_id}", response_model=BoardResponse)
+def get_one_board(board_id: str):
+    board = get_board(board_id)
+    if board is None:
+        raise HTTPException(status_code=404, detail="Board not found.")
+    return board
 
 
 @app.post("/generate-board", response_model=BoardResponse)
@@ -94,7 +116,7 @@ async def generate_board(
 
     add_to_history(child_id, vocab_dict)
 
-    return BoardResponse(
+    board_data = BoardData(
         caption=caption,
         core=map_words_to_symbols(vocab_dict["core"]),
         objects=map_words_to_symbols(verified_objects),
@@ -102,3 +124,8 @@ async def generate_board(
         prepositions=map_words_to_symbols(vocab_dict["prepositions"]),
         rejected_objects=rejected_objects,
     )
+
+    ext = mimetypes.guess_extension(photo.content_type) or ".jpg"
+    saved = save_board(child_id, raw, ext, caption, board_data.model_dump())
+
+    return BoardResponse(**board_data.model_dump(), id=saved["id"], image_url=saved["image_url"], created_at=saved["created_at"])

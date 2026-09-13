@@ -9,13 +9,13 @@ vocabulary (e.g. QuickPic, CHI 2024) with an added reliability layer:
 generated vocabulary is cross-checked against the actual photo before it
 reaches the user.
 
-## Status: Phase 4 done, Phase 6 (frontend) started — see `PLAN.md`
+## Status: all 6 phases functionally done except deployment — see `PLAN.md`
 
-Open http://127.0.0.1:8000/ (not just `/docs`) for the actual UI: upload a
-photo, get back a board grouped by part of speech, tap any symbol to hear
-it spoken (via the browser's built-in speech synthesis — no backend TTS
-service needed for this), with a transparent note about anything the
-verification layer filtered out.
+Open http://127.0.0.1:8000/ for the actual app:
+- **Home** — Create a Board / My Library
+- **Create a Board** — upload a photo, optional context, child name, API key
+- **Board** — the photo and the generated symbol board side by side, tap any symbol to hear it spoken, Edit mode to remove a wrongly-suggested tile
+- **My Library** — every board you've created for that child, as a photo grid; click one to reopen it
 
 
 Working right now: upload a photo → BLIP captions it → relevant vocabulary
