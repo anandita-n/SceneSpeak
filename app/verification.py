@@ -36,25 +36,46 @@ def _load_model():
 @torch.no_grad()
 def clip_similarity(image: Image.Image, word: str) -> float:
     """Cosine similarity between the image and the text prompt "a photo of
-    a {word}", scaled to roughly [0, 1] (CLIP's raw cosine sim for
-    plausible image/text pairs typically falls in ~0.15-0.35)."""
+    a {word}". Single-word convenience wrapper — batches internally through
+    clip_similarities, so scoring many words for the same image should use
+    that instead (this re-encodes the image every call, which is wasteful
+    when scoring more than one word)."""
+    return clip_similarities(image, [word])[0]
+
+
+@torch.no_grad()
+def clip_similarities(image: Image.Image, words: list[str]) -> list[float]:
+    """Cosine similarity between one image and each word, encoding the
+    image only once and batching all the text prompts through CLIP in a
+    single forward pass. The naive per-word version was re-running CLIP's
+    image encoder (the expensive part) once per word — for an 8-word board
+    that's 8x more image-encoding work than necessary for the exact same
+    image. This is the actual fix for the "verification feels slow"
+    complaint, not a smaller model."""
+    if not words:
+        return []
     processor, model = _load_model()
-    inputs = processor(text=[f"a photo of a {word}"], images=image, return_tensors="pt", padding=True)
-    outputs = model(**inputs)
-    image_embeds = outputs.image_embeds / outputs.image_embeds.norm(dim=-1, keepdim=True)
-    text_embeds = outputs.text_embeds / outputs.text_embeds.norm(dim=-1, keepdim=True)
-    similarity = (image_embeds @ text_embeds.T).item()
-    return similarity
+
+    image_inputs = processor(images=image, return_tensors="pt")
+    image_embeds = model.get_image_features(**image_inputs)
+    image_embeds = image_embeds / image_embeds.norm(dim=-1, keepdim=True)
+
+    text_inputs = processor(text=[f"a photo of a {w}" for w in words], return_tensors="pt", padding=True)
+    text_embeds = model.get_text_features(**text_inputs)
+    text_embeds = text_embeds / text_embeds.norm(dim=-1, keepdim=True)
+
+    similarities = (text_embeds @ image_embeds.T).squeeze(-1)
+    return similarities.tolist()
 
 
 def verify_objects(image: Image.Image, words: list[str], threshold: float = DEFAULT_THRESHOLD) -> list[dict]:
     """Score each object word against the image. Returns one dict per word
     with its similarity score and whether it passed the threshold."""
-    results = []
-    for word in words:
-        score = clip_similarity(image, word)
-        results.append({"word": word, "score": round(score, 4), "passed": score >= threshold})
-    return results
+    scores = clip_similarities(image, words)
+    return [
+        {"word": word, "score": round(score, 4), "passed": score >= threshold}
+        for word, score in zip(words, scores)
+    ]
 
 
 def filter_verified_objects(image: Image.Image, words: list[str], threshold: float = DEFAULT_THRESHOLD) -> list[str]:
