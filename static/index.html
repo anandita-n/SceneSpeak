@@ -11,23 +11,55 @@
 </head>
 <body>
   <!-- HOME -->
-  <section id="view-home" class="view">
-    <div class="home-wrap">
-      <div class="wordmark">
+  <section id="view-home" class="view view-home">
+    <nav class="home-nav">
+      <div class="wordmark wordmark-sm">
         <span class="wordmark-icon" aria-hidden="true"><span></span><span></span></span>
         <span class="wordmark-text">Scene<b>Speak</b></span>
       </div>
-      <p class="subtitle">AAC communication boards, generated from a real photo.</p>
-      <div class="home-cards">
-        <button type="button" class="home-card" data-nav="create">
-          <span class="home-icon" data-icon="camera"></span>
-          <span>Create a Board</span>
-        </button>
-        <button type="button" class="home-card" data-nav="library">
-          <span class="home-icon" data-icon="book"></span>
-          <span>My Library</span>
-        </button>
+    </nav>
+
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="kicker">Accessible communication, generated instantly</p>
+        <h1>AAC communication boards, built from a photo</h1>
+        <p class="hero-lead">
+          SceneSpeak helps speech-language pathologists, educators, and caregivers create
+          personalized communication boards for autistic and nonverbal children — in seconds,
+          from a real photo of the child's own environment.
+        </p>
+        <p class="hero-lead">
+          Every board is grounded in standardized AAC vocabulary, checked against the photo
+          itself so suggested words actually match what's there, and mapped to recognized AAC
+          symbols — something you can hand to a child with confidence, not just something that
+          looks plausible.
+        </p>
+        <div class="hero-actions">
+          <button type="button" class="btn-primary" data-nav="create">Create a board</button>
+          <button type="button" class="btn-secondary" data-nav="library">
+            <span data-icon="book"></span>
+            My Library
+          </button>
+        </div>
       </div>
+
+      <div class="hero-preview" aria-hidden="true">
+        <div class="preview-card">
+          <p class="preview-card-title">Playground</p>
+          <div class="preview-tile-grid">
+            <div class="preview-tile core"><img src="https://static.arasaac.org/pictograms/5441/5441_500.png" alt="" /><span>want</span></div>
+            <div class="preview-tile core"><img src="https://static.arasaac.org/pictograms/5508/5508_500.png" alt="" /><span>more</span></div>
+            <div class="preview-tile objects"><img src="https://static.arasaac.org/pictograms/4608/4608_500.png" alt="" /><span>swing</span></div>
+            <div class="preview-tile core"><img src="https://static.arasaac.org/pictograms/32648/32648_500.png" alt="" /><span>help</span></div>
+            <div class="preview-tile descriptors"><span class="preview-placeholder" data-icon="text"></span><span>happy</span></div>
+            <div class="preview-tile prepositions"><span class="preview-placeholder" data-icon="text"></span><span>up</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accent-bar">
+      <span></span><span></span><span></span><span></span>
     </div>
   </section>
 
