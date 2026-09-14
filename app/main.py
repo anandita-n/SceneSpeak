@@ -26,8 +26,27 @@ load_dotenv()
 
 app = FastAPI(title="SceneSpeak", version="0.6.0")
 
+
+class NoCacheStaticFiles(StaticFiles):
+    """Plain StaticFiles lets browsers cache CSS/JS aggressively with no
+    revalidation, which meant a redesign could silently keep showing an old
+    stylesheet after a refresh (this happened during development — the
+    layout-affecting rules were from a stale cached file while newer,
+    unrelated rules loaded fine, which is a very confusing bug to diagnose
+    from the outside). This forces a revalidation check on every request
+    instead of trusting a stale local copy."""
+
+    def is_not_modified(self, response_headers, request_headers) -> bool:
+        return False
+
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("/static", NoCacheStaticFiles(directory=STATIC_DIR), name="static")
 app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
 
