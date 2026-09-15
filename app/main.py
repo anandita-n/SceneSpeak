@@ -135,12 +135,23 @@ async def generate_board(
 
     add_to_history(child_id, vocab_dict)
 
+    # Symbol lookups are the actual bottleneck in board generation (each
+    # word is a separate network round-trip to ARASAAC, measured at 1s+ per
+    # word) -- combine every category's words into a single parallel batch
+    # instead of four separate sequential batches, so all of them are in
+    # flight together rather than one category waiting on the last.
+    categories = {"core": vocab_dict["core"], "objects": verified_objects,
+                  "descriptors": vocab_dict["descriptors"], "prepositions": vocab_dict["prepositions"]}
+    all_words = [w for words in categories.values() for w in words]
+    all_symbols = map_words_to_symbols(all_words)
+    symbols_by_word = dict(zip(all_words, all_symbols))
+
     board_data = BoardData(
         caption=caption,
-        core=map_words_to_symbols(vocab_dict["core"]),
-        objects=map_words_to_symbols(verified_objects),
-        descriptors=map_words_to_symbols(vocab_dict["descriptors"]),
-        prepositions=map_words_to_symbols(vocab_dict["prepositions"]),
+        core=[symbols_by_word[w] for w in categories["core"]],
+        objects=[symbols_by_word[w] for w in categories["objects"]],
+        descriptors=[symbols_by_word[w] for w in categories["descriptors"]],
+        prepositions=[symbols_by_word[w] for w in categories["prepositions"]],
         rejected_objects=rejected_objects,
     )
 

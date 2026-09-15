@@ -7,10 +7,13 @@ a free, openly-licensed AAC pictogram set with a public search API, so we
 map each generated word to a real symbol instead of inventing new art.
 """
 
+from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 
 import requests
 from pydantic import BaseModel
+
+_MAX_WORKERS = 10
 
 ARASAAC_SEARCH_URL = "https://api.arasaac.org/api/pictograms/en/search/{query}"
 ARASAAC_IMAGE_URL = "https://static.arasaac.org/pictograms/{symbol_id}/{symbol_id}_500.png"
@@ -78,4 +81,15 @@ def find_symbol(word: str) -> SymbolEntry:
 
 
 def map_words_to_symbols(words: list[str]) -> list[SymbolEntry]:
-    return [find_symbol(w) for w in words]
+    """Look up symbols for every word concurrently. This was the actual
+    bottleneck in board generation — each word is an independent network
+    round-trip to ARASAAC's API, and doing them one at a time measured at
+    over 1 second per word (35+ seconds for a realistic 32-word board),
+    dwarfing every model-inference step in the pipeline combined. These
+    lookups don't depend on each other, so a thread pool (I/O-bound work,
+    not CPU-bound, so the GIL isn't a limiting factor here) lets them
+    happen in parallel instead of queued one after another."""
+    if not words:
+        return []
+    with ThreadPoolExecutor(max_workers=min(_MAX_WORKERS, len(words))) as executor:
+        return list(executor.map(find_symbol, words))
