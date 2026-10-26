@@ -111,12 +111,34 @@ const rejectedEl = document.getElementById("rejected");
 const editToggle = document.getElementById("edit-toggle");
 const boardSection = views.board;
 
-function speak(word) {
+// Server-side gTTS gives the same voice on every device (important for
+// AAC — a word should always sound the same). If the backend can't produce
+// audio (offline, gTTS outage), fall back to the browser's own Web Speech
+// API so tapping a tile never goes silent.
+let currentAudio = null;
+
+function speakWithBrowser(word) {
   if (!("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(word);
   utterance.rate = 0.95;
   window.speechSynthesis.speak(utterance);
+}
+
+function speak(word) {
+  if (currentAudio) currentAudio.pause();
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+
+  const audio = new Audio(`/tts?text=${encodeURIComponent(word)}`);
+  currentAudio = audio;
+  let fellBack = false;
+  const fallback = () => {
+    if (fellBack || currentAudio !== audio) return;
+    fellBack = true;
+    speakWithBrowser(word);
+  };
+  audio.addEventListener("error", fallback);
+  audio.play().catch(fallback);
 }
 
 function renderTile(entry, category) {

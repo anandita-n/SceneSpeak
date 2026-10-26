@@ -28,10 +28,14 @@ recall** — see `scripts/evaluate_verification.py`) → surviving words are
 mapped to real ARASAAC pictograms (falling back to text-only when no good
 symbol exists, rather than showing a wrong one).
 
-Not yet built: TTS + persistence polish (Phase 5), frontend + deployment
-(Phase 6).
+Tapping a tile speaks the word aloud via a server-side gTTS endpoint
+(`GET /tts?text=...`, cached to disk per word so each word is synthesized
+once), falling back to the browser's Web Speech API if the backend can't
+produce audio.
 
-## Stack (Phase 1–4, 6)
+Not yet built: Docker + deployment.
+
+## Stack
 - FastAPI backend
 - BLIP (`Salesforce/blip-image-captioning-base`) for scene captioning
 - ChromaDB for RAG retrieval over the AAC vocabulary corpus (`data/`)
@@ -39,6 +43,7 @@ Not yet built: TTS + persistence polish (Phase 5), frontend + deployment
 - Gemini API for vocabulary generation
 - CLIP (`openai/clip-vit-base-patch32`) for vision-language verification
 - ARASAAC public API for AAC symbol mapping
+- gTTS for text-to-speech (disk-cached MP3 per word, Web Speech API fallback)
 
 ## Evaluating the verification layer
 ```bash

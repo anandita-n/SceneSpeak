@@ -19,6 +19,7 @@ from app.captioning import generate_caption
 from app.history import add_to_history, get_child_history
 from app.rag import retrieve_vocabulary_context
 from app.symbols import SymbolEntry, map_words_to_symbols
+from app.tts import TTSError, synthesize
 from app.verification import verify_objects
 from app.vocab import generate_vocabulary
 
@@ -73,6 +74,22 @@ class BoardResponse(BoardData):
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/tts")
+def tts(text: str):
+    """Spoken audio (MP3) for a board word. Cached per word, so the browser
+    can also cache it long-term — the same text always yields the same audio."""
+    try:
+        path = synthesize(text)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except TTSError as exc:
+        # The frontend falls back to the browser's Web Speech API on any
+        # non-OK response, so a gTTS outage degrades instead of going silent.
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return FileResponse(path, media_type="audio/mpeg",
+                        headers={"Cache-Control": "public, max-age=31536000, immutable"})
 
 
 @app.get("/boards")

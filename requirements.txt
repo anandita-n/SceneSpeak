@@ -9,4 +9,5 @@ python-dotenv==1.0.1
 pydantic==2.9.2
 chromadb==0.5.5
 requests>=2.33.0
+gTTS==2.5.3
 
