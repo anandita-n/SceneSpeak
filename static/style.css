@@ -18,10 +18,14 @@
   --shadow-lg: 0 2px 4px rgba(30, 30, 20, 0.05), 0 10px 24px rgba(30, 30, 20, 0.08);
   --radius: 14px;
 
-  --core: #fbe8c6; --core-ink: #8a5a1e;
-  --objects: #cfe8ea; --objects-ink: #205b60;
-  --descriptors: #dde8bd; --descriptors-ink: #55661f;
-  --prepositions: #f3d9d2; --prepositions-ink: #8a4636;
+  /* Modified Fitzgerald Key colour convention: people yellow, actions
+     green, describing words blue, things orange. */
+  --pronouns: #fbf0b8; --pronouns-ink: #7a6410;
+  --verbs: #d6ecc6; --verbs-ink: #3c6420;
+  --prepositions: #e6dcf2; --prepositions-ink: #5a3f80;
+  --descriptors: #d3e3f5; --descriptors-ink: #24507e;
+  --objects: #fbdcc0; --objects-ink: #8a4a16;
+  --core: #ecebe6; --core-ink: #55544f;
 }
 
 * { box-sizing: border-box; }
@@ -237,7 +241,8 @@ h1, h2, h3, .wordmark-text, .preview-card-title, .btn-primary, .btn-secondary, #
   color: var(--muted);
 }
 
-.preview-tile.core { background: var(--core); color: var(--core-ink); }
+.preview-tile.pronouns { background: var(--pronouns); color: var(--pronouns-ink); }
+.preview-tile.verbs { background: var(--verbs); color: var(--verbs-ink); }
 .preview-tile.objects { background: var(--objects); color: var(--objects-ink); }
 .preview-tile.descriptors { background: var(--descriptors); color: var(--descriptors-ink); }
 .preview-tile.prepositions { background: var(--prepositions); color: var(--prepositions-ink); }
@@ -403,6 +408,20 @@ button { font-family: inherit; }
 .category { margin-bottom: 24px; }
 .category:last-child { margin-bottom: 0; }
 
+/* Fitzgerald Key: each part of speech is a column, read left to right
+   like a sentence. Narrow screens fall back to stacked rows (same order). */
+@media (min-width: 1000px) {
+  #categories {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+  }
+  #categories .category { margin-bottom: 0; }
+  #categories .tile-grid { grid-template-columns: 1fr; }
+}
+
 .category h3 {
   font-size: 0.76rem;
   text-transform: uppercase;
@@ -450,6 +469,8 @@ button { font-family: inherit; }
 }
 
 .tile.core { background: var(--core); color: var(--core-ink); }
+.tile.pronouns { background: var(--pronouns); color: var(--pronouns-ink); }
+.tile.verbs { background: var(--verbs); color: var(--verbs-ink); }
 .tile.objects { background: var(--objects); color: var(--objects-ink); }
 .tile.descriptors { background: var(--descriptors); color: var(--descriptors-ink); }
 .tile.prepositions { background: var(--prepositions); color: var(--prepositions-ink); }

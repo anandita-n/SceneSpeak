@@ -21,7 +21,7 @@ from app.rag import retrieve_vocabulary_context
 from app.symbols import SymbolEntry, map_words_to_symbols
 from app.tts import TTSError, synthesize
 from app.verification import verify_objects
-from app.vocab import generate_vocabulary
+from app.vocab import FITZGERALD_ORDER, generate_vocabulary
 
 load_dotenv()
 
@@ -58,11 +58,15 @@ def index():
 
 class BoardData(BaseModel):
     caption: str
-    core: list[SymbolEntry]
-    objects: list[SymbolEntry]
-    descriptors: list[SymbolEntry]
-    prepositions: list[SymbolEntry]
-    rejected_objects: list[dict]  # words the LLM suggested that verification filtered out, with their CLIP scores
+    # Fitzgerald Key order (see app/vocab.py). Defaults keep boards saved
+    # before this layout loadable.
+    pronouns: list[SymbolEntry] = []
+    verbs: list[SymbolEntry] = []
+    prepositions: list[SymbolEntry] = []
+    descriptors: list[SymbolEntry] = []
+    objects: list[SymbolEntry] = []
+    core: list[SymbolEntry] = []  # legacy: boards generated before the QuickPic-style switch
+    rejected_objects: list[dict] = []  # words the LLM suggested that verification filtered out, with their CLIP scores
 
 
 class BoardResponse(BoardData):
@@ -142,7 +146,7 @@ async def generate_board(
 
     vocab_dict = vocabulary.model_dump()
 
-    # Verify only the "objects" category — core vocabulary and prepositions
+    # Verify only the "objects" category — pronouns, verbs and prepositions
     # aren't things a photo depicts, so scoring them against image
     # similarity wouldn't mean anything (see app/verification.py).
     object_scores = verify_objects(image, vocab_dict["objects"])
@@ -155,20 +159,15 @@ async def generate_board(
     # Symbol lookups are the actual bottleneck in board generation (each
     # word is a separate network round-trip to ARASAAC, measured at 1s+ per
     # word) -- combine every category's words into a single parallel batch
-    # instead of four separate sequential batches, so all of them are in
-    # flight together rather than one category waiting on the last.
-    categories = {"core": vocab_dict["core"], "objects": verified_objects,
-                  "descriptors": vocab_dict["descriptors"], "prepositions": vocab_dict["prepositions"]}
-    all_words = [w for words in categories.values() for w in words]
-    all_symbols = map_words_to_symbols(all_words)
-    symbols_by_word = dict(zip(all_words, all_symbols))
+    # instead of separate sequential batches per category, so all of them are
+    # in flight together rather than one category waiting on the last.
+    categories = {c: vocab_dict[c] for c in FITZGERALD_ORDER}
+    all_words = list(dict.fromkeys(w for words in categories.values() for w in words))
+    symbols_by_word = dict(zip(all_words, map_words_to_symbols(all_words)))
 
     board_data = BoardData(
         caption=caption,
-        core=[symbols_by_word[w] for w in categories["core"]],
-        objects=[symbols_by_word[w] for w in categories["objects"]],
-        descriptors=[symbols_by_word[w] for w in categories["descriptors"]],
-        prepositions=[symbols_by_word[w] for w in categories["prepositions"]],
+        **{c: [symbols_by_word[w] for w in words] for c, words in categories.items()},
         rejected_objects=rejected_objects,
     )
 

@@ -1,10 +1,16 @@
 """Phase 1: LLM-based vocabulary generation from a scene caption.
 
-This is intentionally the simplest version of the pipeline — a caption goes
-in, categorized AAC vocabulary comes out. Phase 2 adds RAG grounding
-(a real core-vocabulary corpus + per-child history via ChromaDB) on top of
-this same function; Phase 3 adds symbol mapping; Phase 4 adds the
-BLIP/CLIP verification layer that checks this output against the photo.
+Follows the QuickPic AAC approach (Yu et al., IJERPH 2024): the LLM
+generates topic-specific vocabulary per part of speech, and the board lays
+those categories out in modified Fitzgerald Key order — pronouns, verbs,
+prepositions, descriptors, objects, left to right — so symbols sit in the
+grammatical position a child would reach for them in a sentence. A
+child's core vocabulary lives on their main AAC device, so a topic board
+doesn't try to regenerate it.
+
+Phase 2 adds RAG grounding (scenario word sets via ChromaDB + per-child
+history) on top of this same function; Phase 3 adds symbol mapping; Phase 4
+adds the CLIP verification layer that checks objects against the photo.
 """
 
 import json
@@ -22,11 +28,16 @@ from pydantic import BaseModel, Field
 _PREFERRED_MODEL_NAME = "gemini-1.5-flash"
 
 
+# Modified Fitzgerald Key column order, left to right, as used by QuickPic.
+FITZGERALD_ORDER = ("pronouns", "verbs", "prepositions", "descriptors", "objects")
+
+
 class VocabularySet(BaseModel):
-    core: list[str] = Field(default_factory=list, description="High-frequency AAC core words (want, more, go, stop, help...)")
-    objects: list[str] = Field(default_factory=list, description="Nouns specific to this scene")
-    descriptors: list[str] = Field(default_factory=list, description="Adjectives/adverbs relevant to the scene")
+    pronouns: list[str] = Field(default_factory=list, description="People/pronouns a child would use about this scene (I, you, we, my...)")
+    verbs: list[str] = Field(default_factory=list, description="Actions in this scene, base form (play, push, eat...)")
     prepositions: list[str] = Field(default_factory=list, description="Spatial/relational words relevant to the scene")
+    descriptors: list[str] = Field(default_factory=list, description="Adjectives/adverbs relevant to the scene")
+    objects: list[str] = Field(default_factory=list, description="Nouns specific to this scene")
 
 
 @lru_cache(maxsize=8)
@@ -85,7 +96,7 @@ def _build_prompt(
     if retrieved_vocabulary:
         word_list = ", ".join(sorted({e["word"] for e in retrieved_vocabulary}))
         grounding += (
-            "\n\nPrefer words from this standardized AAC vocabulary list when they fit "
+            "\n\nPrefer words from these curated AAC scenario word sets when they fit "
             f"the scene (only include ones that are actually relevant, don't force all of them): {word_list}"
         )
     if child_history:
@@ -96,20 +107,26 @@ def _build_prompt(
         )
 
     return f"""You support a speech-language pathologist building an AAC
-(Augmentative and Alternative Communication) topic board for a nonverbal or
-minimally-verbal child. Given the scene below, suggest vocabulary the child
-could use to talk about it during a language-learning activity.
+(Augmentative and Alternative Communication) topic display for a nonverbal
+or minimally-verbal child. Given the scene below, suggest vocabulary the
+child could use to talk about it during a language-learning activity. The
+display will be arranged by part of speech in Fitzgerald Key order.
 
 {context}{grounding}
 
-Return between 6 and 10 words per category. Core words should be common,
-reusable, high-frequency words a child would use across many situations
-(e.g. want, more, help, stop, go, look). Objects, descriptors, and
-prepositions should be specific to this scene. Use simple, literal,
-first-person-usable words — avoid rare or abstract vocabulary.
+Return words for each category:
+- pronouns: 3-6 words (e.g. I, you, we, my, it)
+- verbs: 6-10 actions, in base form (e.g. play, push, eat)
+- prepositions: 4-8 spatial/relational words
+- descriptors: 6-10 adjectives/adverbs
+- objects: 6-10 nouns that are actually visible or present in the scene
+
+Use simple, literal words a child could say in the first person; short
+phrases (e.g. "my turn") are fine where one word won't do. Avoid rare or
+abstract vocabulary, and only suggest words relevant to this scene.
 
 Respond with only a JSON object shaped exactly like this, no other text:
-{{"core": [...], "objects": [...], "descriptors": [...], "prepositions": [...]}}"""
+{{"pronouns": [...], "verbs": [...], "prepositions": [...], "descriptors": [...], "objects": [...]}}"""
 
 
 def generate_vocabulary(

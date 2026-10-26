@@ -1,11 +1,12 @@
-"""Phase 2: RAG grounding over a curated AAC vocabulary corpus.
+"""Phase 2: RAG grounding over curated AAC scenario word sets.
 
-Instead of letting the LLM freely invent vocabulary from the caption alone,
-we retrieve the most semantically relevant entries from a real,
-standardized AAC core-vocabulary list plus scenario-tagged fringe
-vocabulary, and feed those into the generation prompt. This keeps
-suggestions consistent with actual AAC practice instead of varying
-arbitrarily between runs.
+Prior LLM-based AAC work (QuickPic AAC, Yu et al. 2024) generates each topic display from
+scratch, so the same scene can yield different wording every time. Instead
+we retrieve the most semantically relevant entries from curated,
+scenario-tagged AAC word sets (playground, mealtime, classroom...) and feed
+them into the generation prompt — together with the child's own board
+history (app/history.py) — so suggestions stay consistent across runs and
+across a child's boards.
 """
 
 import json
@@ -16,17 +17,15 @@ import chromadb
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 CHROMA_DIR = DATA_DIR / "chroma"
-COLLECTION_NAME = "aac_vocabulary"
+# Versioned name: the corpus changed (core list removed, phrases relabeled),
+# so a new name makes existing installs rebuild the index instead of
+# silently querying stale embeddings.
+COLLECTION_NAME = "aac_scenario_vocabulary_v2"
 
 
 def _load_corpus() -> list[dict]:
-    entries = []
-    with open(DATA_DIR / "aac_core_vocabulary.json", encoding="utf-8") as f:
-        for item in json.load(f):
-            entries.append({**item, "scenario": "core"})
     with open(DATA_DIR / "aac_scenario_vocabulary.json", encoding="utf-8") as f:
-        entries.extend(json.load(f))
-    return entries
+        return json.load(f)
 
 
 @lru_cache(maxsize=1)
@@ -47,20 +46,9 @@ def _get_collection():
 
 
 def retrieve_vocabulary_context(caption: str, scenario: str | None, k: int = 15) -> list[dict]:
-    """Return up to `k` corpus entries most relevant to this caption/scenario,
-    always including the full core-vocabulary set (it's small and should
-    always be available as an option, not just when semantically close)."""
+    """Return up to `k` scenario-vocabulary entries most relevant to this
+    caption/scenario."""
     collection = _get_collection()
     query = caption if not scenario else f"{caption}. Context: {scenario}"
     results = collection.query(query_texts=[query], n_results=k)
-    retrieved = results["metadatas"][0] if results["metadatas"] else []
-
-    # Always include core vocabulary, de-duplicated against retrieved results.
-    core = [e for e in _load_corpus() if e["scenario"] == "core"]
-    seen_words = {e["word"] for e in retrieved}
-    for entry in core:
-        if entry["word"] not in seen_words:
-            retrieved.append(entry)
-            seen_words.add(entry["word"])
-
-    return retrieved
+    return results["metadatas"][0] if results["metadatas"] else []

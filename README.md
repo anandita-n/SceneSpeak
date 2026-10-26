@@ -4,10 +4,16 @@ Generates AAC (Augmentative and Alternative Communication) topic boards
 from a real photo of a scene, for speech-language pathologists and
 caregivers supporting nonverbal or minimally-verbal children.
 
-Extends the approach explored in academic work on LLM-generated AAC
-vocabulary (e.g. QuickPic, CHI 2024) with an added reliability layer:
-generated vocabulary is cross-checked against the actual photo before it
-reaches the user.
+Builds on QuickPic AAC (Yu et al., *IJERPH* 2024), which generates
+topic-specific vocabulary per part of speech with an LLM and lays it out in
+modified Fitzgerald Key order. SceneSpeak adds two things QuickPic doesn't
+have:
+- **RAG grounding** — suggestions are grounded in curated AAC scenario word
+  sets and the child's own board history, so wording stays consistent
+  across boards instead of being regenerated from scratch each time.
+- **Vision-language verification** — suggested objects are cross-checked
+  against the actual photo with CLIP before they reach the user, instead of
+  relying on the clinician to delete wrong words by hand.
 
 ## Status: all 6 phases functionally done except deployment — see `PLAN.md`
 
@@ -18,15 +24,23 @@ Open http://127.0.0.1:8000/ for the actual app:
 - **My Library** — every board you've created for that child, as a photo grid; click one to reopen it
 
 
-Working right now: upload a photo → BLIP captions it → relevant vocabulary
-is retrieved from a curated AAC corpus (ChromaDB) and combined with that
-child's prior history (SQLite) → an LLM generates categorized AAC
-vocabulary grounded in all of that → generated **objects** are
+Working right now: upload a photo → BLIP captions it → relevant words are
+retrieved from curated AAC scenario word sets (ChromaDB) and combined with
+that child's prior history (SQLite) → an LLM generates pronouns, verbs,
+prepositions, descriptors and objects grounded in all of that → generated **objects** are
 independently verified against the real photo with CLIP, filtering out
 anything that doesn't actually match (measured **90.9% precision / 83.3%
 recall** — see `scripts/evaluate_verification.py`) → surviving words are
 mapped to real ARASAAC pictograms (falling back to text-only when no good
-symbol exists, rather than showing a wrong one).
+symbol exists, rather than showing a wrong one) → the board is laid out
+in modified Fitzgerald Key columns (people, actions, prepositions,
+describing words, things — left to right, colour-coded by the usual
+convention).
+
+There's deliberately no generated "core words" category: a child's core
+vocabulary lives in fixed positions on their main AAC device (motor
+planning depends on that), so a topic board adds scene-specific words
+rather than regenerating core ones.
 
 Tapping a tile speaks the word aloud via a server-side gTTS endpoint
 (`GET /tts?text=...`, cached to disk per word so each word is synthesized
@@ -38,7 +52,7 @@ Not yet built: Docker + deployment.
 ## Stack
 - FastAPI backend
 - BLIP (`Salesforce/blip-image-captioning-base`) for scene captioning
-- ChromaDB for RAG retrieval over the AAC vocabulary corpus (`data/`)
+- ChromaDB for RAG retrieval over curated AAC scenario word sets (`data/aac_scenario_vocabulary.json`)
 - SQLite for per-child vocabulary history
 - Gemini API for vocabulary generation
 - CLIP (`openai/clip-vit-base-patch32`) for vision-language verification

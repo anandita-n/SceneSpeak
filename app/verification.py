@@ -7,8 +7,8 @@ against the real image using CLIP, and filters out words whose visual
 similarity falls below a threshold — catching mistakes the caption-only
 pipeline (Phases 1-3) has no way to notice on its own.
 
-Scoped to the "objects" category deliberately: core vocabulary (want,
-help, stop) and prepositions (in, up) aren't things a photo depicts, so
+Scoped to the "objects" category deliberately: pronouns (I, you), verbs
+(want, push) and prepositions (in, up) aren't things a photo depicts, so
 scoring them against image similarity would be meaningless — CLIP
 verification only makes sense for words that claim something concrete is
 visible in the scene.

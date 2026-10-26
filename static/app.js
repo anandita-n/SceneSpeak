@@ -1,8 +1,13 @@
+// Modified Fitzgerald Key order, left to right (as in QuickPic AAC). "core"
+// only appears on boards saved before the switch to this layout.
+const CATEGORY_ORDER = ["core", "pronouns", "verbs", "prepositions", "descriptors", "objects"];
 const CATEGORY_LABELS = {
   core: "Core Words",
-  objects: "Objects",
-  descriptors: "Descriptors",
+  pronouns: "People",
+  verbs: "Actions",
   prepositions: "Prepositions",
+  descriptors: "Describing",
+  objects: "Things",
 };
 
 const API_KEY_STORAGE_KEY = "scenespeak_gemini_api_key";
@@ -191,7 +196,7 @@ function renderBoard(data) {
   editToggle.innerHTML = `<span data-icon="edit"></span>Edit`;
   hydrateIcons(editToggle);
 
-  for (const category of ["core", "objects", "descriptors", "prepositions"]) {
+  for (const category of CATEGORY_ORDER) {
     const entries = data[category] || [];
     if (entries.length === 0) continue;
 
