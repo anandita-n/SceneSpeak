@@ -4,55 +4,59 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SceneSpeak</title>
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=4" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css?v=16" />
 </head>
 <body>
+  <header class="site-header">
+    <div class="container site-header-inner">
+      <a href="#" class="wordmark" data-nav="home" aria-label="SceneSpeak home">
+        <svg class="wordmark-logo" viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M11 5h14a9 9 0 0 1 9 9v12a9 9 0 0 1-9 9H17l-9 8v-8h1a9 9 0 0 1-7-9V14a9 9 0 0 1 9-9z" fill="currentColor"/>
+          <rect x="6" y="9" width="11" height="10" rx="2.5" fill="#ffd966"/>
+          <rect x="19" y="9" width="11" height="10" rx="2.5" fill="#8fd6a0"/>
+          <rect x="6" y="21" width="11" height="10" rx="2.5" fill="#8ec5f2"/>
+          <rect x="19" y="21" width="11" height="10" rx="2.5" fill="#ffb07a"/>
+          <path d="M38.5 15.5a6.5 6.5 0 0 1 0 9" fill="none" stroke="#2e8b5e" stroke-width="3" stroke-linecap="round"/>
+          <path d="M43 11.5a12 12 0 0 1 0 17" fill="none" stroke="#2e8b5e" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+        <span class="wordmark-text">Scene<b>Speak</b></span>
+      </a>
+      <nav class="site-nav">
+        <a href="#" class="nav-link" data-nav="library">My library</a>
+        <button type="button" class="btn-primary btn-small" data-nav="create">Create a board</button>
+      </nav>
+    </div>
+  </header>
+
   <!-- HOME -->
   <section id="view-home" class="view view-home">
-    <nav class="home-nav">
-      <div class="wordmark wordmark-sm">
-        <span class="wordmark-icon" aria-hidden="true"><span></span><span></span></span>
-        <span class="wordmark-text">Scene<b>Speak</b></span>
-      </div>
-    </nav>
 
-    <div class="hero">
-      <div class="hero-copy">
-        <p class="kicker">Accessible communication, generated instantly</p>
-        <h1>AAC communication boards, built from a photo</h1>
-        <p class="hero-lead">
-          SceneSpeak helps speech-language pathologists, educators, and caregivers create
-          personalized communication boards for autistic and nonverbal children — in seconds,
-          from a real photo of the child's own environment.
-        </p>
-        <p class="hero-lead">
-          Every board is built from what's actually in the photo, grounded in curated AAC
-          word sets for 36 everyday situations, laid out in Fitzgerald Key order, and mapped to recognized AAC
-          symbols — something you can hand to a child with confidence, not just something that
-          looks plausible.
-        </p>
-        <div class="hero-actions">
-          <button type="button" class="btn-primary" data-nav="create">Create a board</button>
-          <button type="button" class="btn-secondary" data-nav="library">
-            <span data-icon="book"></span>
-            My Library
-          </button>
+    <!-- Hero -->
+    <div class="band band-hero">
+      <div class="container hero">
+        <div class="hero-copy">
+          <h1>AAC communication boards</h1>
+          <p class="hero-lead">
+            Turn a photo of a child's surroundings into a picture-symbol board they can point to
+            and tap to hear. Made for speech-language pathologists, teachers and families.
+          </p>
+          <a class="hero-more" href="#about">Learn more <span aria-hidden="true">↓</span></a>
         </div>
-      </div>
-
-      <div class="hero-preview" aria-hidden="true">
-        <div class="preview-card">
-          <p class="preview-card-title">Playground</p>
-          <div class="preview-tile-grid">
-            <div class="preview-tile pronouns"><span class="preview-placeholder" data-icon="text"></span><span>I</span></div>
-            <div class="preview-tile verbs"><img src="https://static.arasaac.org/pictograms/5441/5441_500.png" alt="" /><span>want</span></div>
-            <div class="preview-tile verbs"><img src="https://static.arasaac.org/pictograms/32648/32648_500.png" alt="" /><span>help</span></div>
-            <div class="preview-tile prepositions"><span class="preview-placeholder" data-icon="text"></span><span>up</span></div>
-            <div class="preview-tile descriptors"><span class="preview-placeholder" data-icon="text"></span><span>happy</span></div>
-            <div class="preview-tile objects"><img src="https://static.arasaac.org/pictograms/4608/4608_500.png" alt="" /><span>swing</span></div>
+        <div class="hero-preview" aria-hidden="true">
+          <div class="preview-card">
+            <p class="preview-card-title">Playground</p>
+            <div class="preview-tile-grid">
+              <div class="preview-tile pronouns"><span class="preview-placeholder" data-icon="text"></span><span>I</span></div>
+              <div class="preview-tile verbs"><img src="https://static.arasaac.org/pictograms/5441/5441_500.png" alt="" /><span>want</span></div>
+              <div class="preview-tile verbs"><img src="https://static.arasaac.org/pictograms/32648/32648_500.png" alt="" /><span>help</span></div>
+              <div class="preview-tile prepositions"><span class="preview-placeholder" data-icon="text"></span><span>up</span></div>
+              <div class="preview-tile descriptors"><span class="preview-placeholder" data-icon="text"></span><span>happy</span></div>
+              <div class="preview-tile objects"><img src="https://static.arasaac.org/pictograms/4608/4608_500.png" alt="" /><span>swing</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -61,25 +65,90 @@
     <div class="accent-bar">
       <span></span><span></span><span></span><span></span>
     </div>
+
+    <!-- 1. What a board is, and who it's for -->
+    <section class="band band-tint" id="about">
+      <div class="container">
+        <div class="section-head">
+          <h2>About communication boards</h2>
+          <span class="section-rule"></span>
+        </div>
+        <div class="about">
+          <div class="about-copy">
+            <h3>What is a communication board?</h3>
+            <p>
+              A communication board is a grid of picture symbols a child can point to — instead of,
+              or alongside, speaking. It's one form of <b>AAC</b> (Augmentative and Alternative
+              Communication).
+            </p>
+            <p>
+              A board built around one place or activity gives a child exactly the words they need
+              in that moment: at the playground, "swing", "push" and "my turn" matter far more than
+              a general list of words.
+            </p>
+          </div>
+          <div class="who-card">
+            <h3>Who it's for</h3>
+            <ul>
+              <li>Autistic children</li>
+              <li>Nonverbal and minimally verbal children</li>
+              <li>Children with Down syndrome or other speech and language needs</li>
+              <li>Children with selective mutism or anxiety</li>
+              <li>Children learning English as an additional language</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. How SceneSpeak makes one -->
+    <section class="band" id="how">
+      <div class="container">
+        <div class="section-head">
+          <h2>How SceneSpeak works</h2>
+          <span class="section-rule"></span>
+        </div>
+        <ol class="steps">
+          <li>
+            <span class="step-num">1</span>
+            <h3>Upload a photo</h3>
+            <p>Any picture of the child's surroundings — the playground, the snack table, bath time.</p>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <h3>Get a board</h3>
+            <p>Words for what's in the photo, each with a symbol, in sentence order: people, actions, places, describing words, things. Words the child already knows keep the same wording.</p>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <h3>Tap and talk</h3>
+            <p>Each tile speaks its word aloud. Remove any word that doesn't fit before you start.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
   </section>
 
   <!-- CREATE -->
   <section id="view-create" class="view" hidden>
-    <div class="topbar">
-      <button type="button" class="icon-btn" data-nav="home"><span data-icon="home"></span>Home</button>
-      <h2>Create a Board</h2>
-      <span class="topbar-spacer"></span>
+    <div class="container">
+    <div class="page-head">
+      <div>
+        <h1>Create a board</h1>
+        <p>Upload a photo of the scene and SceneSpeak will build a board for it.</p>
+      </div>
     </div>
     <div class="card">
       <form id="board-form">
         <div class="form-row">
           <div class="field">
-            <label for="photo">Photo of the scene</label>
+            <span class="field-label" id="photo-label">Photo of the scene</span>
+            <input type="file" id="photo" name="photo" accept="image/*" required class="visually-hidden" />
             <label class="file-drop" id="file-drop" for="photo">
               <span class="file-drop-icon" data-icon="upload"></span>
               <span id="file-drop-label">Choose a photo</span>
             </label>
-            <input type="file" id="photo" name="photo" accept="image/*" required hidden />
             <img id="preview" alt="Preview of the uploaded photo" />
           </div>
           <div class="field">
@@ -97,19 +166,26 @@
             <input type="password" id="gemini_api_key" name="gemini_api_key" placeholder="AIza..." autocomplete="off" />
           </div>
         </div>
+        <p class="privacy-note">
+          Your photo is sent to Google Gemini to suggest words and saved to your library.
+        </p>
         <button type="submit" id="submit-btn">Create board</button>
         <p class="quota-note" id="quota-note" hidden></p>
-        <div class="status" id="status"></div>
+        <div class="status" id="status" role="status"></div>
       </form>
+    </div>
     </div>
   </section>
 
   <!-- BOARD -->
   <section id="view-board" class="view" hidden>
-    <div class="topbar">
-      <button type="button" class="icon-btn" data-nav="home"><span data-icon="home"></span>Home</button>
-      <h2>Board</h2>
-      <button type="button" class="icon-btn" id="edit-toggle"><span data-icon="edit"></span>Edit</button>
+    <div class="container">
+    <div class="page-head">
+      <div>
+        <h1>Board</h1>
+        <p>Tap a symbol to hear it. Use Edit to remove words that don't fit.</p>
+      </div>
+      <button type="button" class="btn-secondary btn-small" id="edit-toggle"><span data-icon="edit"></span>Edit</button>
     </div>
     <div class="board-layout">
       <div class="board-photo-pane">
@@ -121,20 +197,24 @@
         <div class="rejected" id="rejected" hidden></div>
       </div>
     </div>
+    </div>
   </section>
 
   <!-- LIBRARY -->
   <section id="view-library" class="view" hidden>
-    <div class="topbar">
-      <button type="button" class="icon-btn" data-nav="home"><span data-icon="home"></span>Home</button>
-      <h2>My Library</h2>
-      <span class="topbar-spacer"></span>
+    <div class="container">
+    <div class="page-head">
+      <div>
+        <h1>My library</h1>
+        <p>Every board you've made for this child. Select one to open it.</p>
+      </div>
     </div>
     <div id="library-grid" class="library-grid"></div>
     <p id="library-empty" class="status" hidden>No boards yet — create your first one.</p>
+    </div>
   </section>
 
-  <script src="/static/icons.js?v=3"></script>
-  <script src="/static/app.js?v=3"></script>
+  <script src="/static/icons.js?v=8"></script>
+  <script src="/static/app.js?v=5"></script>
 </body>
 </html>

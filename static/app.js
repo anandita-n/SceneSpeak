@@ -35,10 +35,19 @@ function showView(name) {
     el.hidden = key !== name;
   }
   if (name === "library") loadLibrary();
+  // Mark the current page in the shared header (for styling and screen readers).
+  document.querySelectorAll(".site-header [data-nav]").forEach((el) => {
+    if (el.dataset.nav === name) el.setAttribute("aria-current", "page");
+    else el.removeAttribute("aria-current");
+  });
+  window.scrollTo(0, 0);
 }
 
 document.querySelectorAll("[data-nav]").forEach((el) => {
-  el.addEventListener("click", () => showView(el.dataset.nav));
+  el.addEventListener("click", (event) => {
+    event.preventDefault(); // header nav items are links; don't follow their "#"
+    showView(el.dataset.nav);
+  });
 });
 
 // ---------------- Create form ----------------

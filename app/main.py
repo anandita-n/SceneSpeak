@@ -66,7 +66,9 @@ app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 
 @app.get("/")
 def index():
-    return FileResponse(STATIC_DIR / "index.html")
+    # Same reason as NoCacheStaticFiles: without this a browser can keep
+    # showing an old homepage after the HTML changes.
+    return FileResponse(STATIC_DIR / "index.html", headers={"Cache-Control": "no-cache"})
 
 
 class BoardData(BaseModel):
