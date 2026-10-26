@@ -367,6 +367,8 @@ button { font-family: inherit; }
 
 #preview { max-width: 220px; border-radius: 12px; margin-top: 12px; display: none; box-shadow: var(--shadow); }
 
+.form-row[hidden], .quota-note[hidden] { display: none; }
+.quota-note { margin: 10px 0 0; font-size: 0.8rem; color: var(--muted-2); text-align: center; }
 .status { margin-top: 14px; font-size: 0.88rem; color: var(--muted); text-align: center; }
 .status.error { color: var(--bad); }
 

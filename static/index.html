@@ -29,8 +29,8 @@
           from a real photo of the child's own environment.
         </p>
         <p class="hero-lead">
-          Every board is grounded in standardized AAC vocabulary, checked against the photo
-          itself so suggested words actually match what's there, and mapped to recognized AAC
+          Every board is built from what's actually in the photo, grounded in curated AAC
+          word sets for 36 everyday situations, laid out in Fitzgerald Key order, and mapped to recognized AAC
           symbols — something you can hand to a child with confidence, not just something that
           looks plausible.
         </p>
@@ -91,13 +91,14 @@
             <input type="text" id="child_id" name="child_id" placeholder="e.g. Alex" value="default" />
           </div>
         </div>
-        <div class="form-row">
+        <div class="form-row" id="api-key-row">
           <div class="field">
             <label for="gemini_api_key">Gemini API key <span class="hint">(saved in this browser only — skip if set in .env)</span></label>
             <input type="password" id="gemini_api_key" name="gemini_api_key" placeholder="AIza..." autocomplete="off" />
           </div>
         </div>
         <button type="submit" id="submit-btn">Create board</button>
+        <p class="quota-note" id="quota-note" hidden></p>
         <div class="status" id="status"></div>
       </form>
     </div>

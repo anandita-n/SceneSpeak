@@ -1,9 +1,11 @@
-"""SceneSpeak — photo in, a verified, symbol-mapped, RAG-grounded AAC
-board out. Run with: python run.py
+"""SceneSpeak — photo in, a symbol-mapped, RAG-grounded AAC board out.
+Run with: python run.py
 """
 
 import io
 import mimetypes
+import os
+import threading
 
 from pathlib import Path
 
@@ -19,13 +21,24 @@ from app.captioning import generate_caption
 from app.history import add_to_history, get_child_history
 from app.rag import retrieve_vocabulary_context
 from app.symbols import SymbolEntry, map_words_to_symbols
+from app import usage
 from app.tts import TTSError, synthesize
-from app.verification import verify_objects
-from app.vocab import FITZGERALD_ORDER, generate_vocabulary
+from app.vocab import FITZGERALD_ORDER, GeminiBusyError, GeminiKeyError, GeminiQuotaError, generate_vocabulary
 
 load_dotenv()
 
-app = FastAPI(title="SceneSpeak", version="0.6.0")
+app = FastAPI(title="SceneSpeak", version="0.7.0")
+
+
+@app.on_event("startup")
+def _warm_up():
+    """Load BLIP and build/open the RAG index in the background at startup,
+    so the first caregiver's board doesn't pay for it (measured: ~8s BLIP
+    load, ~30s one-time index build on a fresh install)."""
+    def warm():
+        generate_caption(Image.new("RGB", (64, 64)))
+        retrieve_vocabulary_context("warm up", None, k=1)
+    threading.Thread(target=warm, daemon=True).start()
 
 
 class NoCacheStaticFiles(StaticFiles):
@@ -66,7 +79,7 @@ class BoardData(BaseModel):
     descriptors: list[SymbolEntry] = []
     objects: list[SymbolEntry] = []
     core: list[SymbolEntry] = []  # legacy: boards generated before the QuickPic-style switch
-    rejected_objects: list[dict] = []  # words the LLM suggested that verification filtered out, with their CLIP scores
+    rejected_objects: list[dict] = []  # legacy: CLIP-filtered words on boards from before CLIP was removed
 
 
 class BoardResponse(BoardData):
@@ -78,6 +91,22 @@ class BoardResponse(BoardData):
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+def _server_has_key() -> bool:
+    return bool(os.environ.get("GEMINI_API_KEY"))
+
+
+@app.get("/config")
+def config():
+    """Lets the frontend hide the API-key field when the server already
+    holds a key, and show how many boards are left today."""
+    has_key = _server_has_key()
+    return {
+        "server_key": has_key,
+        "daily_limit": usage.daily_limit() if has_key else None,
+        "remaining_today": usage.remaining_today() if has_key else None,
+    }
 
 
 @app.get("/tts")
@@ -125,35 +154,46 @@ async def generate_board(
     except Exception as exc:
         raise HTTPException(status_code=400, detail=f"Could not read image: {exc}") from exc
 
-    caption = generate_caption(image)
-    retrieved_vocabulary = retrieve_vocabulary_context(caption, scenario)
-    child_history = get_child_history(child_id)
+    # Only boards that spend the server's own key count toward the daily
+    # cap. Checked before BLIP/RAG so a capped request fails fast.
+    uses_server_key = not gemini_api_key and _server_has_key()
+    if uses_server_key and not usage.try_reserve():
+        raise HTTPException(
+            status_code=429,
+            detail=f"Today's limit of {usage.daily_limit()} boards has been reached. "
+                   "It resets at midnight UTC — please try again tomorrow.",
+        )
 
     try:
+        caption = generate_caption(image)
+        retrieved_vocabulary = retrieve_vocabulary_context(caption, scenario)
+        child_history = get_child_history(child_id)
         vocabulary = generate_vocabulary(
             caption,
             scenario,
+            image=image,
             retrieved_vocabulary=retrieved_vocabulary,
             child_history=child_history,
             api_key=gemini_api_key or None,
         )
-    except RuntimeError as exc:
-        # e.g. missing GEMINI_API_KEY — surface the real reason as JSON so
-        # the frontend can show it, instead of a generic 500 with no body.
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
     except Exception as exc:
+        # No usable board came out of this request, so don't let it eat
+        # into today's allowance.
+        if uses_server_key:
+            usage.release()
+        if isinstance(exc, GeminiQuotaError):
+            raise HTTPException(status_code=429, detail=str(exc)) from exc
+        if isinstance(exc, GeminiBusyError):
+            raise HTTPException(status_code=503, detail=str(exc)) from exc
+        if isinstance(exc, GeminiKeyError):
+            raise HTTPException(status_code=401, detail=str(exc)) from exc
+        if isinstance(exc, RuntimeError):
+            # e.g. missing GEMINI_API_KEY — surface the real reason as JSON so
+            # the frontend can show it, instead of a generic 500 with no body.
+            raise HTTPException(status_code=500, detail=str(exc)) from exc
         raise HTTPException(status_code=502, detail=f"Vocabulary generation failed: {exc}") from exc
 
     vocab_dict = vocabulary.model_dump()
-
-    # Verify only the "objects" category — pronouns, verbs and prepositions
-    # aren't things a photo depicts, so scoring them against image
-    # similarity wouldn't mean anything (see app/verification.py).
-    object_scores = verify_objects(image, vocab_dict["objects"])
-    verified_objects = [r["word"] for r in object_scores if r["passed"]]
-    rejected_objects = [r for r in object_scores if not r["passed"]]
-    vocab_dict["objects"] = verified_objects
-
     add_to_history(child_id, vocab_dict)
 
     # Symbol lookups are the actual bottleneck in board generation (each
@@ -168,7 +208,6 @@ async def generate_board(
     board_data = BoardData(
         caption=caption,
         **{c: [symbols_by_word[w] for w in words] for c, words in categories.items()},
-        rejected_objects=rejected_objects,
     )
 
     ext = mimetypes.guess_extension(photo.content_type) or ".jpg"

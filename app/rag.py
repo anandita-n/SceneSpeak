@@ -7,6 +7,10 @@ scenario-tagged AAC word sets (playground, mealtime, classroom...) and feed
 them into the generation prompt — together with the child's own board
 history (app/history.py) — so suggestions stay consistent across runs and
 across a child's boards.
+
+The corpus covers 36 everyday scenarios (~800 entries, ~500 unique words),
+far more than belongs in one prompt, so retrieval narrows it to the
+handful of scenarios a given photo is actually about.
 """
 
 import json
@@ -20,7 +24,7 @@ CHROMA_DIR = DATA_DIR / "chroma"
 # Versioned name: the corpus changed (core list removed, phrases relabeled),
 # so a new name makes existing installs rebuild the index instead of
 # silently querying stale embeddings.
-COLLECTION_NAME = "aac_scenario_vocabulary_v2"
+COLLECTION_NAME = "aac_scenario_vocabulary_v3"
 
 
 def _load_corpus() -> list[dict]:
@@ -45,7 +49,7 @@ def _get_collection():
     return collection
 
 
-def retrieve_vocabulary_context(caption: str, scenario: str | None, k: int = 15) -> list[dict]:
+def retrieve_vocabulary_context(caption: str, scenario: str | None, k: int = 30) -> list[dict]:
     """Return up to `k` scenario-vocabulary entries most relevant to this
     caption/scenario."""
     collection = _get_collection()

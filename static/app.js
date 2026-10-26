@@ -58,6 +58,29 @@ apiKeyInput.addEventListener("input", () => {
   else localStorage.removeItem(API_KEY_STORAGE_KEY);
 });
 
+// When the server holds its own Gemini key, caregivers never see a key
+// field — they just get a daily allowance of boards.
+const apiKeyRow = document.getElementById("api-key-row");
+const quotaNote = document.getElementById("quota-note");
+
+async function loadConfig() {
+  try {
+    const response = await fetch("/config");
+    const config = await response.json();
+    if (!config.server_key) return;
+    apiKeyRow.hidden = true;
+    apiKeyInput.disabled = true; // disabled inputs aren't sent with the form
+    const left = config.remaining_today;
+    quotaNote.textContent = left > 0
+      ? `${left} of ${config.daily_limit} boards left today`
+      : `Today's limit of ${config.daily_limit} boards has been reached — it resets at midnight UTC.`;
+    quotaNote.hidden = false;
+  } catch {
+    // Config is a nicety; the form still works with the key field showing.
+  }
+}
+loadConfig();
+
 const savedChild = localStorage.getItem(CHILD_STORAGE_KEY);
 if (savedChild) childInput.value = savedChild;
 childInput.addEventListener("input", () => {
@@ -105,6 +128,7 @@ form.addEventListener("submit", async (event) => {
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = "Create board";
+    loadConfig();
   }
 });
 
