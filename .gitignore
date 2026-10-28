@@ -8,3 +8,5 @@ data/chroma/
 .DS_Store
 server.log
 data/tts_cache/
+
+data/nltk_data/

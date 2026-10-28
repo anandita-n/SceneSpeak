@@ -3,9 +3,11 @@ Run with: python run.py
 """
 
 import io
+import logging
 import mimetypes
 import os
 import threading
+from concurrent.futures import ThreadPoolExecutor
 
 from pathlib import Path
 
@@ -23,9 +25,11 @@ from app.rag import retrieve_vocabulary_context
 from app.symbols import SymbolEntry, map_words_to_symbols
 from app import usage
 from app.tts import TTSError, synthesize
+from app.verification import get_verifier, verify_board
 from app.vocab import FITZGERALD_ORDER, GeminiBusyError, GeminiKeyError, GeminiQuotaError, generate_vocabulary
 
 load_dotenv()
+logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(name)s %(message)s")
 
 app = FastAPI(title="SceneSpeak", version="0.7.0")
 
@@ -36,8 +40,10 @@ def _warm_up():
     so the first caregiver's board doesn't pay for it (measured: ~8s BLIP
     load, ~30s one-time index build on a fresh install)."""
     def warm():
-        generate_caption(Image.new("RGB", (64, 64)))
+        blank = Image.new("RGB", (64, 64))
+        generate_caption(blank)
         retrieve_vocabulary_context("warm up", None, k=1)
+        get_verifier().verify(blank, ["ball"], caption="a ball")  # loads its model/data, if any
     threading.Thread(target=warm, daemon=True).start()
 
 
@@ -82,6 +88,7 @@ class BoardData(BaseModel):
     objects: list[SymbolEntry] = []
     core: list[SymbolEntry] = []  # legacy: boards generated before the QuickPic-style switch
     rejected_objects: list[dict] = []  # legacy: CLIP-filtered words on boards from before CLIP was removed
+    verification: dict | None = None  # which verifier ran, its latency, how many words it scored
 
 
 class BoardResponse(BoardData):
@@ -205,11 +212,25 @@ async def generate_board(
     # in flight together rather than one category waiting on the last.
     categories = {c: vocab_dict[c] for c in FITZGERALD_ORDER}
     all_words = list(dict.fromkeys(w for words in categories.values() for w in words))
-    symbols_by_word = dict(zip(all_words, map_words_to_symbols(all_words)))
+
+    # Verification (CPU) and symbol lookups (network) don't depend on each
+    # other, so run them side by side rather than one after the other.
+    verifier = get_verifier()
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        verification = pool.submit(verify_board, image, categories, caption, verifier)
+        symbols_by_word = dict(zip(all_words, map_words_to_symbols(all_words)))
+        scores, verify_ms = verification.result()
+
+    def entry(word: str) -> SymbolEntry:
+        # Copy: SymbolEntry objects are shared through find_symbol's cache.
+        s = scores[word]
+        return symbols_by_word[word].model_copy(update={"score": s.score, "low_confidence": not s.verified})
 
     board_data = BoardData(
         caption=caption,
-        **{c: [symbols_by_word[w] for w in words] for c, words in categories.items()},
+        **{c: [entry(w) for w in words] for c, words in categories.items()},
+        verification={"verifier": verifier.name, "latency_ms": round(verify_ms),
+                      "checked": sum(1 for s in scores.values() if s.score is not None)},
     )
 
     ext = mimetypes.guess_extension(photo.content_type) or ".jpg"

@@ -187,6 +187,15 @@ function renderTile(entry, category) {
   btn.type = "button";
   btn.className = `tile ${category}`;
   btn.setAttribute("aria-label", `Say "${entry.word}"`);
+  // The verifier wasn't confident this word is in the photo: keep it, but
+  // show it greyed out so the caregiver can decide whether to remove it.
+  if (entry.low_confidence) {
+    btn.classList.add("low-confidence");
+    btn.setAttribute("aria-label", `Say "${entry.word}" (may not be in the photo)`);
+    btn.title = entry.score != null
+      ? `May not be in the photo (match score ${entry.score})`
+      : "May not be in the photo";
+  }
 
   if (entry.image_url) {
     const img = document.createElement("img");
@@ -248,7 +257,12 @@ function renderBoard(data) {
     categoriesEl.appendChild(section);
   }
 
-  if (data.rejected_objects && data.rejected_objects.length > 0) {
+  const lowConfidence = CATEGORY_ORDER.flatMap((c) => data[c] || []).filter((e) => e.low_confidence);
+  if (lowConfidence.length > 0) {
+    rejectedEl.innerHTML = `<b>Greyed-out words</b> may not be in the photo. Keep them, or remove them with Edit.`;
+    rejectedEl.hidden = false;
+  } else if (data.rejected_objects && data.rejected_objects.length > 0) {
+    // Boards saved before CLIP was removed.
     const words = data.rejected_objects.map((r) => `${r.word} (score ${r.score})`).join(", ");
     rejectedEl.innerHTML = `<b>Filtered out</b> — suggested but didn't match the photo closely enough: ${words}`;
     rejectedEl.hidden = false;

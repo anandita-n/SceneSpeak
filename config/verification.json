@@ -1,0 +1,24 @@
+{
+  "_comment": "Settings for app/verification.py. 'verifier' can be overridden with the VERIFIER environment variable. The default stays 'none' until the Phase 2 evaluation shows which verifier actually helps; the thresholds below are starting points, not tuned values.",
+
+  "verifier": "none",
+
+  "verify_categories": ["objects", "verbs"],
+
+  "thresholds": {
+    "blip_itm": 0.5,
+    "caption_overlap": 0.3
+  },
+
+  "blip_itm_model": "Salesforce/blip-itm-base-coco",
+  "blip_itm_prompt": "a photo containing {word}",
+  "caption_overlap_samples": 2,
+
+  "protected_words": [
+    "i", "me", "my", "mine", "you", "your", "we", "us", "they", "it", "he", "she",
+    "want", "more", "stop", "help", "go", "come", "look", "like", "need", "get",
+    "have", "do", "make", "put", "turn", "open", "play", "eat", "drink",
+    "yes", "no", "not", "please", "thank you", "all done", "finished", "again",
+    "wait", "my turn", "your turn", "here", "there", "this", "that"
+  ]
+}

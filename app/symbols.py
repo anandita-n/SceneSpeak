@@ -24,6 +24,9 @@ class SymbolEntry(BaseModel):
     word: str
     symbol_id: int | None = None
     image_url: str | None = None
+    # Set by the verifier (app/verification.py): None = not scored.
+    score: float | None = None
+    low_confidence: bool = False
 
 
 def _relevance(term_lower: str, result: dict) -> tuple[int, int] | None:

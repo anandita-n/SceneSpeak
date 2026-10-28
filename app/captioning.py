@@ -5,6 +5,7 @@ photo, and is shown to the caregiver as the scene description."""
 
 from functools import lru_cache
 
+import torch
 from PIL import Image
 from transformers import BlipForConditionalGeneration, BlipProcessor
 
@@ -37,3 +38,23 @@ def generate_caption(image: Image.Image, max_new_tokens: int = 30) -> str:
     )
     caption = processor.decode(output_ids[0], skip_special_tokens=True)
     return caption.strip()
+
+
+def generate_sampled_captions(image: Image.Image, n: int = 2, seed: int = 0, max_new_tokens: int = 30) -> list[str]:
+    """Generate `n` extra captions with nucleus sampling, for broader coverage
+    of what's in the scene than the single beam-search caption gives. Seeded,
+    so the same image always yields the same captions (repeatable eval)."""
+    if n <= 0:
+        return []
+    processor, model = _load_model()
+    inputs = processor(images=image, return_tensors="pt")
+    torch.manual_seed(seed)
+    output_ids = model.generate(
+        **inputs,
+        max_new_tokens=max_new_tokens,
+        do_sample=True,
+        top_p=0.9,
+        num_return_sequences=n,
+        no_repeat_ngram_size=3,
+    )
+    return [processor.decode(ids, skip_special_tokens=True).strip() for ids in output_ids]
