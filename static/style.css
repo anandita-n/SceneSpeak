@@ -594,6 +594,24 @@ input::placeholder { color: var(--muted-2); }
 
 .editing .remove-tile { display: flex; }
 
+/* Add-a-word form: only shown in Edit mode. */
+.add-word { display: none; margin-top: var(--space-3); padding-top: var(--space-2); border-top: 1px solid var(--border); }
+.editing .add-word { display: block; }
+.add-word label { display: block; font-size: var(--text-sm); font-weight: 600; margin-bottom: var(--space-1); }
+.add-word-row { display: flex; gap: var(--space-1); flex-wrap: wrap; }
+.add-word-row input { flex: 1; min-width: 160px; }
+.add-word select {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+}
+.edit-status { text-align: left; }
+.edit-status:empty { display: none; }
+
 .rejected {
   font-size: var(--text-sm);
   color: var(--muted);

@@ -5,6 +5,8 @@ Compares captioners against COCO's five human reference captions per image:
   blip_base             Salesforce/blip-image-captioning-base, 5 beams
   blip_base_scenespeak  the same model with SceneSpeak's decoding (3 beams,
                         no_repeat_ngram_size=3, repetition_penalty=1.3)
+  blip_base_norep       3 beams, no_repeat_ngram_size=3, no repetition penalty
+  blip_base_greedy      1 beam (greedy), no_repeat_ngram_size=3
   blip_finetuned        BLIP fine-tuned in the GenAi image-captioning project
                         (Flickr8k), 5 beams
   gemini                Gemini, asked for a one-sentence caption, temperature 0
@@ -47,6 +49,11 @@ GEMINI_PROMPT = ("Write a caption for this photo: one short, plain sentence (abo
                  "describing the main subject and what is happening, like a typical photo caption. "
                  "Reply with the caption only.")
 ALL_MODELS = ("blip_base", "blip_base_scenespeak", "blip_finetuned", "gemini")
+# Decoding variants of BLIP base, for choosing SceneSpeak's caption settings.
+VARIANTS = {
+    "blip_base_norep": dict(num_beams=3, max_new_tokens=30, no_repeat_ngram_size=3),
+    "blip_base_greedy": dict(num_beams=1, max_new_tokens=30, no_repeat_ngram_size=3),
+}
 
 
 # ---------------------------------------------------------------- captioners
@@ -187,6 +194,9 @@ def main() -> None:
     if "blip_base_scenespeak" in models:
         captioners["blip_base_scenespeak"] = blip_captioner(
             BASE_MODEL, num_beams=3, max_new_tokens=30, no_repeat_ngram_size=3, repetition_penalty=1.3)
+    for name, kwargs in VARIANTS.items():
+        if name in models:
+            captioners[name] = blip_captioner(BASE_MODEL, **kwargs)
     if "blip_finetuned" in models:
         if not args.finetuned_dir.exists():
             sys.exit(f"Fine-tuned checkpoint not found: {args.finetuned_dir}")

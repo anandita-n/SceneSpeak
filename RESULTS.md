@@ -88,3 +88,92 @@ Example captions (first 3 images):
   - gemini: “A baseball player in a blue jersey holding a bat.”
 
 Metrics mirror the GenAi project's `src/evaluate.py` (lower-cased, punctuation stripped). Gemini was prompted for a one-sentence caption at temperature 0; its time is the API round trip (BLIP times are local CPU inference).
+
+## Latency profile — baseline — 2026-10-28 08:49
+
+- Command: `python scripts/profile_board.py --label baseline --images 5`
+- Git commit: `0271659` (plus uncommitted changes if any) · 5 boards · fresh server process, warmed up · verifier: config default
+
+| Stage | Median | Max |
+|---|---|---|
+| caption | 3.73s | 4.31s |
+| retrieval | 0.03s | 0.04s |
+| llm | 3.15s | 4.42s |
+| symbols_and_verify | 1.57s | 4.42s |
+| save | 0.01s | 0.01s |
+| **total (server)** | 8.49s | 11.65s |
+
+- End-to-end wall time: p50 8.50s, p95 11.71s
+- Worst `/health` response while a board was generating: median 8297 ms, max 11468 ms (how long other requests were stuck waiting)
+- Raw per-board timings: `[{"caption": 2765, "retrieval": 35, "llm": 4425, "symbols_and_verify": 4416, "save": 7, "total": 11649}, {"caption": 3726, "retrieval": 43, "llm": 1681, "symbols_and_verify": 2343, "save": 7, "total": 7799}, {"caption": 4306, "retrieval": 33, "llm": 2209, "symbols_and_verify": 1188, "save": 7, "total": 7742}, {"caption": 3723, "retrieval": 33, "llm": 3149, "symbols_and_verify": 1575, "save": 10, "total": 8490}, {"caption": 4020, "retrieval": 31, "llm": 3431, "symbols_and_verify": 1151, "save": 8, "total": 8642}]`
+- Test boards removed afterwards: 5
+
+## Captioning evaluation 2026-10-28 08:49
+
+- Command: `python eval/caption_eval.py --captions C:/Users/adi/.cache/scenespeak/coco/captions_val2017.json --models blip_base_scenespeak,blip_base_norep,blip_base_greedy`
+- Git commit: `0271659` · images: 50 COCO val2017 eval images · references: COCO's 5 human captions each
+- Fine-tuned model: not run
+- Gemini: not run
+- Raw output: `eval/results/2026-10-28_0849_captions/` (captions.jsonl, summary.csv)
+
+| Captioner | BLEU-4 | METEOR | ROUGE-L | CIDEr | Words/caption | Median time |
+|---|---|---|---|---|---|---|
+| blip_base_scenespeak | 0.4155 | 0.5160 | 0.5601 | 1.2769 | 8.9 | 3.61s |
+| blip_base_norep | 0.4127 | 0.5159 | 0.5624 | 1.2882 | 8.9 | 3.59s |
+| blip_base_greedy | 0.3751 | 0.4820 | 0.5675 | 1.2106 | 7.6 | 1.51s |
+
+Example captions (first 3 images):
+
+- `ball_games_01_coco100238.jpg` — reference: “A family standing next to each other while holding frisbees.”
+  - blip_base_scenespeak: “a woman holding a frth”
+  - blip_base_norep: “a woman holding a frth”
+  - blip_base_greedy: “a man and woman holding frth frths”
+- `ball_games_02_coco139872.jpg` — reference: “A dog laying on grass near a flying disc.”
+  - blip_base_scenespeak: “a black and white dog laying in the grass”
+  - blip_base_norep: “a black and white dog laying in the grass”
+  - blip_base_greedy: “a dog laying on the grass”
+- `ball_games_03_coco239773.jpg` — reference: “Baseball player in blue and white uniform swinging at a ball.”
+  - blip_base_scenespeak: “a baseball player swinging at a pitch during a game”
+  - blip_base_norep: “a baseball player swinging a bat”
+  - blip_base_greedy: “a baseball player”
+
+Metrics mirror the GenAi project's `src/evaluate.py` (lower-cased, punctuation stripped). Gemini was prompted for a one-sentence caption at temperature 0; its time is the API round trip (BLIP times are local CPU inference).
+
+## Latency profile — after (empty symbol cache) — 2026-10-28 08:59
+
+- Command: `python scripts/profile_board.py --label after (empty symbol cache) --images 5`
+- Git commit: `0271659` (plus uncommitted changes if any) · 5 boards · fresh server process, warmed up · verifier: config default
+
+| Stage | Median | Max |
+|---|---|---|
+| caption | 3.42s | 3.94s |
+| retrieval | 0.03s | 0.03s |
+| llm | 1.75s | 2.98s |
+| symbols_and_verify | 2.22s | 4.09s |
+| save | 0.01s | 0.01s |
+| **total (server)** | 7.73s | 8.54s |
+
+- End-to-end wall time: p50 7.76s, p95 8.60s
+- Worst `/health` response while a board was generating: median 28 ms, max 35 ms (how long other requests were stuck waiting)
+- Raw per-board timings: `[{"caption": 2676, "retrieval": 25, "llm": 1750, "symbols_and_verify": 4087, "save": 6, "total": 8544}, {"caption": 3533, "retrieval": 30, "llm": 1708, "symbols_and_verify": 2452, "save": 6, "total": 7730}, {"caption": 3941, "retrieval": 28, "llm": 1944, "symbols_and_verify": 2222, "save": 6, "total": 8141}, {"caption": 3421, "retrieval": 28, "llm": 1711, "symbols_and_verify": 1438, "save": 7, "total": 6604}, {"caption": 3345, "retrieval": 28, "llm": 2981, "symbols_and_verify": 1260, "save": 6, "total": 7620}]`
+- Test boards removed afterwards: 5
+
+## Latency profile — after (symbol cache on disk) — 2026-10-28 09:00
+
+- Command: `python scripts/profile_board.py --label after (symbol cache on disk) --images 5`
+- Git commit: `0271659` (plus uncommitted changes if any) · 5 boards · fresh server process, warmed up · verifier: config default
+
+| Stage | Median | Max |
+|---|---|---|
+| caption | 3.40s | 3.93s |
+| retrieval | 0.03s | 0.03s |
+| llm | 2.79s | 3.87s |
+| symbols_and_verify | 1.15s | 1.23s |
+| save | 0.01s | 0.01s |
+| **total (server)** | 6.47s | 8.46s |
+
+- End-to-end wall time: p50 6.48s, p95 8.47s
+- Worst `/health` response while a board was generating: median 27 ms, max 41 ms (how long other requests were stuck waiting)
+- Raw per-board timings: `[{"caption": 2657, "retrieval": 30, "llm": 1624, "symbols_and_verify": 1226, "save": 7, "total": 5543}, {"caption": 3402, "retrieval": 29, "llm": 3868, "symbols_and_verify": 1155, "save": 6, "total": 8461}, {"caption": 3927, "retrieval": 28, "llm": 2789, "symbols_and_verify": 1153, "save": 7, "total": 7904}, {"caption": 3552, "retrieval": 30, "llm": 2063, "symbols_and_verify": 813, "save": 6, "total": 6464}, {"caption": 3359, "retrieval": 29, "llm": 3055, "symbols_and_verify": 21, "save": 5, "total": 6469}]`
+- Test boards removed afterwards: 5
+- Note on the two "after" profiles above: both include the Phase 3 changes (sync board endpoint, ARASAAC disk cache, no repetition penalty). The second run's server also started after the prompt's RAG wording change (Phase 4, `rag_mode: wording`) was saved, so its LLM stage isn't strictly comparable. Gemini latency varies ~1.6–3.9 s per call, so total-time differences across 5 boards are within noise; the event-loop fix (other requests stuck 8,297 ms → 28 ms median) is the robust result.

@@ -67,7 +67,7 @@ def get_board(board_id: str, owner: str) -> dict | None:
     prefix = f"{owner}:"
     with closing(_connect()) as conn:
         row = conn.execute(
-            "SELECT id, image_filename, caption, data_json, created_at FROM boards "
+            "SELECT id, image_filename, caption, data_json, created_at, child_id FROM boards "
             "WHERE id = ? AND substr(child_id, 1, ?) = ?",
             (board_id, len(prefix), prefix),
         ).fetchone()
@@ -78,4 +78,36 @@ def get_board(board_id: str, owner: str) -> dict | None:
     data["image_url"] = f"/uploads/{row[1]}"
     data["caption"] = row[2]
     data["created_at"] = row[4]
+    data["child_id"] = row[5]
     return data
+
+
+# Fields stored in data_json; the rest of a board (id, image, caption, date)
+# lives in its own columns.
+_META_FIELDS = {"id", "image_url", "caption", "created_at", "child_id", "timings_ms"}
+
+
+def update_board(board_id: str, owner: str, board: dict) -> None:
+    """Save an edited board's words (owner-checked like get_board)."""
+    prefix = f"{owner}:"
+    data = {k: v for k, v in board.items() if k not in _META_FIELDS}
+    with closing(_connect()) as conn:
+        conn.execute(
+            "UPDATE boards SET data_json = ? WHERE id = ? AND substr(child_id, 1, ?) = ?",
+            (json.dumps(data), board_id, len(prefix), prefix),
+        )
+        conn.commit()
+
+
+def board_words(board_ids: list[str], categories: tuple[str, ...]) -> dict[str, list[str]]:
+    """The words currently on each of these boards, by board id."""
+    if not board_ids:
+        return {}
+    marks = ",".join("?" * len(board_ids))
+    with closing(_connect()) as conn:
+        rows = conn.execute(f"SELECT id, data_json FROM boards WHERE id IN ({marks})", board_ids).fetchall()
+    out = {}
+    for board_id, data_json in rows:
+        data = json.loads(data_json)
+        out[board_id] = [e["word"] for c in categories for e in data.get(c, [])]
+    return out

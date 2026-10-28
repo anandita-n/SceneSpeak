@@ -17,7 +17,15 @@ import json
 from functools import lru_cache
 from pathlib import Path
 
+import logging
+
 import chromadb
+from chromadb.config import Settings
+
+# chromadb 0.5.5 still calls its (incompatible) posthog client even with
+# telemetry off, logging a harmless "Failed to send telemetry event" error
+# on every operation. Silence just that logger.
+logging.getLogger("chromadb.telemetry.product.posthog").setLevel(logging.CRITICAL)
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 CHROMA_DIR = DATA_DIR / "chroma"
@@ -33,9 +41,17 @@ def _load_corpus() -> list[dict]:
 
 
 @lru_cache(maxsize=1)
+def get_client():
+    """The one Chroma client for this process (shared with app/personalization.py —
+    Chroma doesn't allow two clients on the same folder)."""
+    # Telemetry off: it's not needed, and chromadb 0.5.5's telemetry client
+    # only logs "Failed to send telemetry event" errors with current posthog.
+    return chromadb.PersistentClient(path=str(CHROMA_DIR), settings=Settings(anonymized_telemetry=False))
+
+
+@lru_cache(maxsize=1)
 def _get_collection():
-    client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-    collection = client.get_or_create_collection(COLLECTION_NAME)
+    collection = get_client().get_or_create_collection(COLLECTION_NAME)
 
     if collection.count() == 0:
         entries = _load_corpus()

@@ -1,0 +1,13 @@
+{
+  "_comment": "Settings for vocabulary generation (app/vocab.py, app/personalization.py).",
+
+  "_rag_mode": "'wording': curated AAC words are given only as the standard wording to use if the model mentions that concept (default). 'suggest': the original behaviour — 'prefer words from this list', which the 2026-10-28 smoke eval suggested pulls in typical-but-absent objects (e.g. cup, bowl in a kitchen photo without them).",
+  "rag_mode": "wording",
+
+  "_personalization": "'similar_scenes': use only this child's boards for the most similar past scenes, with caregiver edits applied (default). 'full_history': the original behaviour — every word the child ever had, in every prompt.",
+  "personalization": "similar_scenes",
+
+  "similar_scenes": 3,
+  "_max_scene_distance": "Chroma L2 distance on normalised embeddings; 1.0 is roughly cosine similarity 0.5. Past scenes further away than this are ignored.",
+  "max_scene_distance": 1.0
+}

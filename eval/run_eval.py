@@ -3,9 +3,11 @@
 Configurations
   A0  caption only — Gemini gets BLIP's caption, not the photo; no RAG, no verifier
   A   LLM only     — Gemini gets the photo + caption; no RAG, no verifier
-  B   LLM + RAG
-  C   LLM + RAG + caption_overlap verifier
-  D   LLM + RAG + blip_itm verifier
+  B   LLM + RAG, original "suggest" mode ("prefer words from this list")
+  C   B + caption_overlap verifier
+  D   B + blip_itm verifier
+  E   LLM + RAG, "wording" mode (curated words only set the wording) — the
+      app's default since Phase 4
 
 C and D score the *same* boards B generated in that run: verification is
 post-processing that never changes what Gemini returns, so re-generating
@@ -55,11 +57,12 @@ RESULTS_MD = ROOT / "RESULTS.md"
 CONFIGS: dict[str, dict] = {
     "A0": {"image": False, "rag": False, "verifier": None, "label": "Caption only (no photo), no RAG"},
     "A": {"image": True, "rag": False, "verifier": None, "label": "LLM with photo, no RAG"},
-    "B": {"image": True, "rag": True, "verifier": None, "label": "LLM + RAG"},
-    "C": {"image": True, "rag": True, "verifier": "caption_overlap", "label": "LLM + RAG + caption_overlap"},
-    "D": {"image": True, "rag": True, "verifier": "blip_itm", "label": "LLM + RAG + blip_itm"},
+    "B": {"image": True, "rag": "suggest", "verifier": None, "label": "LLM + RAG (suggest mode)"},
+    "C": {"image": True, "rag": "suggest", "verifier": "caption_overlap", "label": "B + caption_overlap"},
+    "D": {"image": True, "rag": "suggest", "verifier": "blip_itm", "label": "B + blip_itm"},
+    "E": {"image": True, "rag": "wording", "verifier": None, "label": "LLM + RAG (wording mode)"},
 }
-GENERATING = ("A0", "A", "B")
+GENERATING = ("A0", "A", "B", "E")
 
 SWEEP = {
     "caption_overlap": [0.0, 0.33, 0.66, 1.0],
@@ -132,7 +135,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--limit", type=int, help="evaluate only the first N images (spread across scenes)")
     parser.add_argument("--runs", type=int, default=3)
-    parser.add_argument("--configs", default="A0,A,B,C,D")
+    parser.add_argument("--configs", default="A0,A,B,C,D,E")
     args = parser.parse_args()
 
     configs = [c.strip() for c in args.configs.split(",") if c.strip()]
@@ -177,6 +180,7 @@ def main() -> None:
                 vocab = generate_with_retry(
                     caption=caption, image=image if cfg["image"] else None,
                     retrieved_vocabulary=retrieved if cfg["rag"] else None,
+                    rag_mode=cfg["rag"] or None,
                     child_history=None, api_key=api_key, temperature=0,
                 ).model_dump()
                 llm_ms = (time.perf_counter() - t) * 1000

@@ -17,12 +17,12 @@ OWNER_B = "B" * 32
 @pytest.fixture
 def isolated_storage(tmp_path, monkeypatch):
     """Point every SQLite table and the uploads folder at a temp directory."""
-    from app import boards, history, usage
+    from app import boards, history, symbols, usage
 
     db = tmp_path / "test.db"
     uploads = tmp_path / "uploads"
     uploads.mkdir()
-    for module in (boards, history, usage):
+    for module in (boards, history, symbols, usage):
         monkeypatch.setattr(module, "DB_PATH", db)
     monkeypatch.setattr(boards, "UPLOADS_DIR", uploads)
     return tmp_path
@@ -44,6 +44,19 @@ def client(isolated_storage, monkeypatch):
         pronouns=["I"], verbs=["cook"], prepositions=["in"], descriptors=["hot"], objects=["fridge", "oven"]))
     monkeypatch.setattr(main, "map_words_to_symbols", lambda words: [SymbolEntry(word=w) for w in words])
     monkeypatch.setattr(main, "get_verifier", lambda name=None: NoVerifier())
+    monkeypatch.setattr(main, "find_symbol", lambda w: SymbolEntry(word=w))
+
+    # Each test gets its own in-memory Chroma collection for child scenes.
+    import uuid
+
+    import chromadb
+    from chromadb.config import Settings
+
+    from app import personalization
+
+    client = chromadb.EphemeralClient(settings=Settings(anonymized_telemetry=False))
+    scenes = client.get_or_create_collection(f"scenes_{uuid.uuid4().hex}")
+    monkeypatch.setattr(personalization, "_scenes", lambda: scenes)
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)  # no daily-limit bookkeeping in these tests
     return TestClient(main.app)
 

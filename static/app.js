@@ -181,6 +181,34 @@ const categoriesEl = document.getElementById("categories");
 const rejectedEl = document.getElementById("rejected");
 const editToggle = document.getElementById("edit-toggle");
 const boardSection = views.board;
+const addWordForm = document.getElementById("add-word-form");
+const addWordInput = document.getElementById("add-word-input");
+const addWordCategory = document.getElementById("add-word-category");
+const editStatus = document.getElementById("edit-status");
+let currentBoard = null;
+
+// Caregiver edits are saved on the server and remembered for this child's
+// future boards of similar scenes (app/personalization.py).
+async function saveEdit(action, word, category) {
+  editStatus.textContent = "";
+  editStatus.classList.remove("error");
+  const response = await apiFetch(`/boards/${currentBoard.id}/edits`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action, word, category }),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    const detail = Array.isArray(body.detail) ? "Please check the word and try again." : body.detail;
+    throw new Error(detail || `Couldn't save the change (${response.status}).`);
+  }
+  return response.json();
+}
+
+function showEditError(err) {
+  editStatus.textContent = err.message || "Couldn't save the change.";
+  editStatus.classList.add("error");
+}
 
 // Server-side gTTS gives the same voice on every device (important for
 // AAC — a word should always sound the same). If the backend can't produce
@@ -252,9 +280,17 @@ function renderTile(entry, category) {
   removeBtn.className = "remove-tile";
   removeBtn.innerHTML = Icon.close();
   removeBtn.title = `Remove "${entry.word}" from this board`;
-  removeBtn.addEventListener("click", (e) => {
+  removeBtn.addEventListener("click", async (e) => {
     e.stopPropagation();
-    wrap.remove();
+    removeBtn.disabled = true;
+    try {
+      await saveEdit("remove", entry.word, category);
+      wrap.remove();
+      editStatus.textContent = `Removed "${entry.word}". It won't be suggested for similar scenes for this child.`;
+    } catch (err) {
+      removeBtn.disabled = false;
+      showEditError(err);
+    }
   });
 
   wrap.appendChild(btn);
@@ -262,14 +298,20 @@ function renderTile(entry, category) {
   return wrap;
 }
 
-function renderBoard(data) {
+function setEditing(on) {
+  boardSection.classList.toggle("editing", on);
+  editToggle.classList.toggle("active", on);
+  editToggle.innerHTML = on ? `<span data-icon="check"></span>Done` : `<span data-icon="edit"></span>Edit`;
+  hydrateIcons(editToggle);
+  if (!on) editStatus.textContent = "";
+}
+
+function renderBoard(data, { keepEditing = false } = {}) {
+  currentBoard = data;
   boardPhoto.src = data.image_url || "";
   captionLine.textContent = `Scene: "${data.caption}"`;
   categoriesEl.innerHTML = "";
-  boardSection.classList.remove("editing");
-  editToggle.classList.remove("active");
-  editToggle.innerHTML = `<span data-icon="edit"></span>Edit`;
-  hydrateIcons(editToggle);
+  setEditing(keepEditing);
 
   for (const category of CATEGORY_ORDER) {
     const entries = data[category] || [];
@@ -304,11 +346,20 @@ function renderBoard(data) {
   }
 }
 
-editToggle.addEventListener("click", () => {
-  const nowEditing = boardSection.classList.toggle("editing");
-  editToggle.classList.toggle("active", nowEditing);
-  editToggle.innerHTML = nowEditing ? `<span data-icon="check"></span>Done` : `<span data-icon="edit"></span>Edit`;
-  hydrateIcons(editToggle);
+editToggle.addEventListener("click", () => setEditing(!boardSection.classList.contains("editing")));
+
+addWordForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const word = addWordInput.value.trim();
+  if (!word) return;
+  try {
+    const updated = await saveEdit("add", word, addWordCategory.value);
+    renderBoard(updated, { keepEditing: true });
+    addWordInput.value = "";
+    editStatus.textContent = `Added "${word}". It will be offered on similar scenes for this child.`;
+  } catch (err) {
+    showEditError(err);
+  }
 });
 
 // ---------------- Library view ----------------

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css?v=19" />
+  <link rel="stylesheet" href="/static/style.css?v=20" />
 </head>
 <body>
   <header class="site-header">
@@ -195,6 +195,21 @@
       </div>
       <div class="board-symbols-pane">
         <div id="categories"></div>
+        <form id="add-word-form" class="add-word">
+          <label for="add-word-input">Add a word</label>
+          <div class="add-word-row">
+            <input type="text" id="add-word-input" maxlength="40" placeholder="e.g. toaster" autocomplete="off" />
+            <select id="add-word-category" aria-label="Column for the new word">
+              <option value="objects">Things</option>
+              <option value="verbs">Actions</option>
+              <option value="descriptors">Describing</option>
+              <option value="prepositions">Prepositions</option>
+              <option value="pronouns">People</option>
+            </select>
+            <button type="submit" class="btn-secondary btn-small">Add</button>
+          </div>
+        </form>
+        <p class="status edit-status" id="edit-status" role="status"></p>
         <div class="rejected" id="rejected" hidden></div>
         <p class="symbol-credit">Symbols by Sergio Palao, <a href="https://arasaac.org" target="_blank" rel="noopener">ARASAAC</a> (Government of Aragón), CC BY-NC-SA</p>
       </div>
@@ -217,6 +232,6 @@
   </section>
 
   <script src="/static/icons.js?v=8"></script>
-  <script src="/static/app.js?v=7"></script>
+  <script src="/static/app.js?v=8"></script>
 </body>
 </html>

@@ -7,8 +7,10 @@ a free, openly-licensed AAC pictogram set with a public search API, so we
 map each generated word to a real symbol instead of inventing new art.
 """
 
+import sqlite3
 from concurrent.futures import ThreadPoolExecutor
-from functools import lru_cache
+from contextlib import closing
+from pathlib import Path
 
 import requests
 from pydantic import BaseModel
@@ -18,6 +20,12 @@ _MAX_WORKERS = 10
 ARASAAC_SEARCH_URL = "https://api.arasaac.org/api/pictograms/en/search/{query}"
 ARASAAC_IMAGE_URL = "https://static.arasaac.org/pictograms/{symbol_id}/{symbol_id}_500.png"
 _TIMEOUT = 5
+
+# Lookups are also cached on disk, so a restart (or a fresh container with a
+# persistent volume) doesn't repeat the network round-trips.
+DB_PATH = Path(__file__).resolve().parent.parent / "data" / "scenespeak.db"
+_NETWORK_ERROR = object()   # a failed request: retry next time, never cache
+_NOT_CACHED = object()
 
 
 class SymbolEntry(BaseModel):
@@ -46,12 +54,16 @@ def _relevance(term_lower: str, result: dict) -> tuple[int, int] | None:
     return (overlap_score, aac_bonus)
 
 
-def _search(term: str) -> int | None:
+def _search(term: str):
+    """The best relevant symbol id for `term`, None if ARASAAC has no relevant
+    symbol, or _NETWORK_ERROR if the request failed."""
     try:
         resp = requests.get(ARASAAC_SEARCH_URL.format(query=term), timeout=_TIMEOUT)
+        if resp.status_code == 404:  # ARASAAC answers "no results" with a 404
+            return None
         resp.raise_for_status()
     except requests.RequestException:
-        return None
+        return _NETWORK_ERROR
 
     results = resp.json()
     if not results:
@@ -67,20 +79,60 @@ def _search(term: str) -> int | None:
     return scored[0][1].get("_id")
 
 
-@lru_cache(maxsize=512)
-def find_symbol(word: str) -> SymbolEntry:
-    """Look up a real AAC symbol for `word`. Falls back to the first word of
-    a multi-word phrase if the exact phrase has no match, and returns a
-    symbol-less entry (word only) if nothing is found at all — the board
-    still shows the word as text rather than silently dropping it."""
+def _connect() -> sqlite3.Connection:
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(DB_PATH, timeout=10)
+    conn.execute("CREATE TABLE IF NOT EXISTS symbol_cache (word TEXT PRIMARY KEY, symbol_id INTEGER)")
+    return conn
+
+
+def _cache_get(word: str):
+    with closing(_connect()) as conn:
+        row = conn.execute("SELECT symbol_id FROM symbol_cache WHERE word = ?", (word.lower(),)).fetchone()
+    return _NOT_CACHED if row is None else row[0]
+
+
+def _cache_put(word: str, symbol_id: int | None) -> None:
+    with closing(_connect()) as conn:
+        conn.execute("INSERT OR REPLACE INTO symbol_cache (word, symbol_id) VALUES (?, ?)", (word.lower(), symbol_id))
+        conn.commit()
+
+
+def _lookup(word: str):
+    """Network lookup with the multi-word fallback (first word of a phrase)."""
     symbol_id = _search(word)
     if symbol_id is None and " " in word:
         symbol_id = _search(word.split(" ")[0])
+    return symbol_id
 
-    if symbol_id is None:
-        return SymbolEntry(word=word)
 
-    return SymbolEntry(word=word, symbol_id=symbol_id, image_url=ARASAAC_IMAGE_URL.format(symbol_id=symbol_id))
+_memory: dict[str, SymbolEntry] = {}  # answered lookups only — failures aren't remembered
+
+
+def find_symbol(word: str) -> SymbolEntry:
+    """Look up a real AAC symbol for `word` (memory cache, then disk cache,
+    then ARASAAC). Falls back to the first word of a multi-word phrase if the
+    exact phrase has no match, and returns a symbol-less entry (word only) if
+    nothing is found at all — the board still shows the word as text rather
+    than silently dropping it."""
+    if word in _memory:
+        return _memory[word]
+    symbol_id = _cache_get(word)
+    if symbol_id is _NOT_CACHED:
+        symbol_id = _lookup(word)
+        if symbol_id is _NETWORK_ERROR:
+            return SymbolEntry(word=word)  # show as text now; retried on the next board
+        _cache_put(word, symbol_id)
+
+    entry = (SymbolEntry(word=word) if symbol_id is None else
+             SymbolEntry(word=word, symbol_id=symbol_id, image_url=ARASAAC_IMAGE_URL.format(symbol_id=symbol_id)))
+    _memory[word] = entry
+    return entry
+
+
+def clear_memory_cache() -> None:
+    """Forget in-memory lookups (the disk cache is kept)."""
+    _memory.clear()
 
 
 def map_words_to_symbols(words: list[str]) -> list[SymbolEntry]:

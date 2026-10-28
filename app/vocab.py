@@ -25,6 +25,7 @@ history) on top of this same function; Phase 3 adds symbol mapping.
 import json
 import logging
 import os
+from pathlib import Path
 from functools import lru_cache
 
 import google.generativeai as genai
@@ -33,6 +34,14 @@ from google.api_core import exceptions as google_exceptions
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger("scenespeak.vocab")
+
+GENERATION_CONFIG_PATH = Path(__file__).resolve().parent.parent / "config" / "generation.json"
+
+
+@lru_cache(maxsize=1)
+def generation_config() -> dict:
+    with open(GENERATION_CONFIG_PATH, encoding="utf-8") as f:
+        return json.load(f)
 
 # Google's "-latest" aliases always point at the current Flash models, so
 # they don't go stale the way pinned versions do (gemini-1.5-flash was
@@ -166,6 +175,9 @@ def _build_prompt(
     retrieved_vocabulary: list[dict] | None = None,
     child_history: list[str] | None = None,
     has_image: bool = True,
+    rag_mode: str = "wording",
+    added_words: list[str] | None = None,
+    removed_words: list[str] | None = None,
 ) -> str:
     # The caption-only evaluation config sends no photo, so the prompt must
     # not claim one is attached.
@@ -181,15 +193,34 @@ def _build_prompt(
     grounding = ""
     if retrieved_vocabulary:
         word_list = ", ".join(sorted({e["word"] for e in retrieved_vocabulary}))
-        grounding += (
-            "\n\nPrefer words from these curated AAC scenario word sets when they fit "
-            f"the scene (only include ones that are actually relevant, don't force all of them): {word_list}"
-        )
+        if rag_mode == "suggest":
+            grounding += (
+                "\n\nPrefer words from these curated AAC scenario word sets when they fit "
+                f"the scene (only include ones that are actually relevant, don't force all of them): {word_list}"
+            )
+        else:
+            # "wording": the curated words set the *wording*, not the content —
+            # listed as suggestions, they pulled in typical-but-absent objects.
+            grounding += (
+                "\n\nStandard AAC wording: if you mention one of these concepts, use exactly "
+                "this word for it. Do NOT add any of them just because they are listed — only "
+                f"if it is actually in the scene: {word_list}"
+            )
     if child_history:
         grounding += (
             "\n\nThis child has previously used these words on other boards — reuse the "
             f"same wording for any that fit this scene, instead of inventing new phrasing "
             f"for the same concept: {', '.join(child_history)}"
+        )
+    if added_words:
+        grounding += (
+            "\n\nThis child's caregiver ADDED these words to boards for similar scenes — "
+            f"include each one that fits this scene: {', '.join(added_words)}"
+        )
+    if removed_words:
+        grounding += (
+            "\n\nThis child's caregiver REMOVED these words from boards for similar scenes — "
+            f"do not suggest them: {', '.join(removed_words)}"
         )
 
     return f"""You support a speech-language pathologist building an AAC
@@ -228,12 +259,21 @@ def generate_vocabulary(
     child_history: list[str] | None = None,
     api_key: str | None = None,
     temperature: float | None = None,
+    rag_mode: str | None = None,
+    added_words: list[str] | None = None,
+    removed_words: list[str] | None = None,
 ) -> VocabularySet:
     """Generate the board's vocabulary. `image` is sent to Gemini alongside the
     caption when given; `temperature` (e.g. 0 for repeatable evaluation)
-    defaults to the model's own setting."""
+    defaults to the model's own setting; `rag_mode` defaults to
+    config/generation.json. `added_words` / `removed_words` are the caregiver's
+    edits on this child's boards for similar scenes (app/personalization.py)."""
     resolved_key = _resolve_api_key(api_key)
-    prompt = _build_prompt(caption, scenario, retrieved_vocabulary, child_history, has_image=image is not None)
+    prompt = _build_prompt(
+        caption, scenario, retrieved_vocabulary, child_history, has_image=image is not None,
+        rag_mode=rag_mode or generation_config()["rag_mode"],
+        added_words=added_words, removed_words=removed_words,
+    )
     contents = [prompt]
     if image is not None:
         image = image.copy()
