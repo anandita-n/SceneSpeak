@@ -14,3 +14,7 @@ data/nltk_data/
 # Eval images: licences vary, so only labels are committed (re-fetch with eval/coco_bootstrap.py --fetch-only)
 eval/dataset/images/*
 !eval/dataset/images/.gitkeep
+
+# Test artifacts
+.coverage
+.pytest_cache/
