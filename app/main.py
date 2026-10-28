@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, HTTPException, UploadFile, Form
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, Form
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from PIL import Image
@@ -21,6 +21,7 @@ from pydantic import BaseModel
 from app.boards import UPLOADS_DIR, get_board, list_boards, save_board
 from app.captioning import generate_caption
 from app.history import add_to_history, get_child_history
+from app.owner import owner_scope, scoped_child
 from app.rag import retrieve_vocabulary_context
 from app.symbols import SymbolEntry, map_words_to_symbols
 from app import usage
@@ -135,13 +136,15 @@ def tts(text: str):
 
 
 @app.get("/boards")
-def get_boards(child_id: str = "default"):
-    return list_boards(child_id)
+def get_boards(child_id: str = "default", owner: str = Depends(owner_scope)):
+    return list_boards(scoped_child(owner, child_id))
 
 
 @app.get("/boards/{board_id}", response_model=BoardResponse)
-def get_one_board(board_id: str):
-    board = get_board(board_id)
+def get_one_board(board_id: str, owner: str = Depends(owner_scope)):
+    # Another owner's board is reported as "not found", not "forbidden",
+    # so its existence isn't revealed.
+    board = get_board(board_id, owner)
     if board is None:
         raise HTTPException(status_code=404, detail="Board not found.")
     return board
@@ -153,7 +156,9 @@ async def generate_board(
     scenario: str | None = Form(None, description="Optional context, e.g. 'practicing at the playground'."),
     child_id: str = Form("default", description="Identifies the child, so vocabulary stays consistent across their boards."),
     gemini_api_key: str | None = Form(None, description="Optional — overrides GEMINI_API_KEY from the environment for this request."),
+    owner: str = Depends(owner_scope),
 ):
+    child_id = scoped_child(owner, child_id)
     if not photo.content_type or not photo.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="Uploaded file must be an image.")
 

@@ -1,0 +1,21 @@
+# Local environment and secrets
+.venv/
+.env
+.git/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+.coverage
+server.log
+
+# Runtime data created by the app (rebuilt or created fresh in the container)
+data/uploads/
+data/*.db
+data/chroma/
+data/tts_cache/
+data/nltk_data/
+
+# Evaluation images and outputs aren't needed to serve the app
+eval/dataset/images/
+eval/results/
+tests/

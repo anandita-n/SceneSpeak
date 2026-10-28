@@ -60,11 +60,16 @@ def list_boards(child_id: str) -> list[dict]:
     ]
 
 
-def get_board(board_id: str) -> dict | None:
+def get_board(board_id: str, owner: str) -> dict | None:
+    """Return a board only if it belongs to `owner` (see app/owner.py) —
+    the ownership check is part of the query, so another owner's board is
+    indistinguishable from a missing one."""
+    prefix = f"{owner}:"
     with closing(_connect()) as conn:
         row = conn.execute(
-            "SELECT id, image_filename, caption, data_json, created_at FROM boards WHERE id = ?",
-            (board_id,),
+            "SELECT id, image_filename, caption, data_json, created_at FROM boards "
+            "WHERE id = ? AND substr(child_id, 1, ?) = ?",
+            (board_id, len(prefix), prefix),
         ).fetchone()
     if row is None:
         return None

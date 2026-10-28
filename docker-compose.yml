@@ -1,0 +1,18 @@
+services:
+  scenespeak:
+    build: .
+    ports:
+      - "8000:7860"           # open http://127.0.0.1:8000
+    env_file:
+      - path: .env            # GEMINI_API_KEY, DAILY_BOARD_LIMIT
+        required: false
+    environment:
+      VERIFIER: ${VERIFIER:-none}
+    volumes:
+      # Boards, photos, word history, speech cache and the RAG index persist
+      # here. A new named volume starts as a copy of the image's data/ folder.
+      - scenespeak-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  scenespeak-data:

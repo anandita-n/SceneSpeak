@@ -605,6 +605,16 @@ input::placeholder { color: var(--muted-2); }
 
 .rejected b { color: var(--bad); }
 
+/* ARASAAC's licence (CC BY-NC-SA) requires crediting the symbols wherever
+   they're shown. */
+.symbol-credit {
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: var(--muted-2);
+}
+.symbol-credit a { color: var(--muted-2); }
+.preview-card .symbol-credit { margin-top: 12px; text-align: center; }
+
 /* ==========================================================================
    Library
    ========================================================================== */

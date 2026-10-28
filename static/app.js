@@ -12,6 +12,39 @@ const CATEGORY_LABELS = {
 
 const API_KEY_STORAGE_KEY = "scenespeak_gemini_api_key";
 const CHILD_STORAGE_KEY = "scenespeak_last_child";
+const OWNER_STORAGE_KEY = "scenespeak_owner_key";
+
+// ---------------- Private owner key ----------------
+// No accounts: this browser's boards are stored under a random secret key
+// made once and kept in localStorage (see app/owner.py). Clearing site data
+// loses access to those boards.
+let sessionOwnerKey = null;
+
+function ownerKey() {
+  try {
+    let key = localStorage.getItem(OWNER_STORAGE_KEY);
+    if (!key) {
+      key = newOwnerKey();
+      localStorage.setItem(OWNER_STORAGE_KEY, key);
+    }
+    return key;
+  } catch {
+    // Storage blocked (e.g. some private windows): keep a key for this tab only.
+    sessionOwnerKey = sessionOwnerKey || newOwnerKey();
+    return sessionOwnerKey;
+  }
+}
+
+function newOwnerKey() {
+  const bytes = crypto.getRandomValues(new Uint8Array(24)); // 192 bits
+  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function apiFetch(url, options = {}) {
+  const headers = new Headers(options.headers || {});
+  headers.set("X-Owner-Key", ownerKey());
+  return fetch(url, { ...options, headers });
+}
 
 // ---------------- Icons ----------------
 function hydrateIcons(root = document) {
@@ -121,7 +154,7 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const formData = new FormData(form);
-    const response = await fetch("/generate-board", { method: "POST", body: formData });
+    const response = await apiFetch("/generate-board", { method: "POST", body: formData });
 
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
@@ -286,7 +319,7 @@ async function loadLibrary() {
   libraryGrid.innerHTML = "";
   libraryEmpty.hidden = true;
   try {
-    const response = await fetch(`/boards?child_id=${encodeURIComponent(currentChildId())}`);
+    const response = await apiFetch(`/boards?child_id=${encodeURIComponent(currentChildId())}`);
     const boards = await response.json();
 
     if (!boards.length) {
@@ -326,7 +359,7 @@ async function loadLibrary() {
 }
 
 async function openBoard(boardId) {
-  const response = await fetch(`/boards/${boardId}`);
+  const response = await apiFetch(`/boards/${boardId}`);
   if (!response.ok) return;
   const data = await response.json();
   renderBoard(data);
