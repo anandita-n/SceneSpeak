@@ -1,0 +1,24 @@
+{
+  "image": "bedroom_01_coco1993.jpg",
+  "scene": "bedroom",
+  "expected": [
+    "bed",
+    "chair",
+    "table"
+  ],
+  "not_present": [
+    "person",
+    "cup",
+    "bottle",
+    "book",
+    "bowl",
+    "couch"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 1993",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm4.staticflickr.com/3413/3223600591_25cb6f12c6_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000001993.jpg",
+  "reviewed": false
+}

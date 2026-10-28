@@ -1,0 +1,27 @@
+{
+  "image": "park_02_coco121506.jpg",
+  "scene": "park",
+  "expected": [
+    "bench",
+    "chair",
+    "table",
+    "umbrella"
+  ],
+  "not_present": [
+    "person",
+    "bag",
+    "truck",
+    "cup",
+    "bottle",
+    "backpack"
+  ],
+  "ignore": [
+    "car"
+  ],
+  "source": "COCO val2017 image 121506",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm8.staticflickr.com/7116/7721233008_99b07f96b1_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000121506.jpg",
+  "reviewed": false
+}

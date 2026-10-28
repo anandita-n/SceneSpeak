@@ -1,0 +1,24 @@
+{
+  "image": "pets_04_coco283412.jpg",
+  "scene": "pets",
+  "expected": [
+    "bed",
+    "cup",
+    "dog"
+  ],
+  "not_present": [
+    "person",
+    "table",
+    "chair",
+    "bottle",
+    "bowl",
+    "knife"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 283412",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm6.staticflickr.com/5215/5499994653_748a7cbcbd_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000283412.jpg",
+  "reviewed": false
+}

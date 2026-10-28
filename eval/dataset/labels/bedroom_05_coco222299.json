@@ -1,0 +1,27 @@
+{
+  "image": "bedroom_05_coco222299.jpg",
+  "scene": "bedroom",
+  "expected": [
+    "bed",
+    "book",
+    "bottle",
+    "laptop"
+  ],
+  "not_present": [
+    "person",
+    "chair",
+    "cup",
+    "table",
+    "bowl",
+    "TV"
+  ],
+  "ignore": [
+    "phone"
+  ],
+  "source": "COCO val2017 image 222299",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm4.staticflickr.com/3270/2569402304_5459e6c3c1_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000222299.jpg",
+  "reviewed": false
+}

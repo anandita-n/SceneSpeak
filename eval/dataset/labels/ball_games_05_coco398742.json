@@ -1,0 +1,24 @@
+{
+  "image": "ball_games_05_coco398742.jpg",
+  "scene": "ball_games",
+  "expected": [
+    "ball",
+    "car",
+    "person"
+  ],
+  "not_present": [
+    "racket",
+    "glove",
+    "chair",
+    "bat",
+    "bench",
+    "truck"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 398742",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm5.staticflickr.com/4117/4913716666_4d871bc5d2_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000398742.jpg",
+  "reviewed": false
+}

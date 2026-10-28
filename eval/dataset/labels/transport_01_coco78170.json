@@ -1,0 +1,28 @@
+{
+  "image": "transport_01_coco78170.jpg",
+  "scene": "transport",
+  "expected": [
+    "bag",
+    "chair",
+    "person",
+    "train"
+  ],
+  "not_present": [
+    "table",
+    "cup",
+    "backpack",
+    "car",
+    "bowl",
+    "umbrella"
+  ],
+  "ignore": [
+    "bottle",
+    "phone"
+  ],
+  "source": "COCO val2017 image 78170",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm9.staticflickr.com/8466/8108218074_bacf160a3c_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000078170.jpg",
+  "reviewed": false
+}

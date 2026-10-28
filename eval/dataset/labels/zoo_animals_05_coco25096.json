@@ -1,0 +1,28 @@
+{
+  "image": "zoo_animals_05_coco25096.jpg",
+  "scene": "zoo_animals",
+  "expected": [
+    "knife",
+    "person",
+    "skateboard",
+    "table"
+  ],
+  "not_present": [
+    "cup",
+    "fork",
+    "bottle",
+    "bowl",
+    "spoon",
+    "pizza"
+  ],
+  "ignore": [
+    "chair",
+    "zebra"
+  ],
+  "source": "COCO val2017 image 25096",
+  "license": "Attribution-NonCommercial-NoDerivs License",
+  "license_url": "http://creativecommons.org/licenses/by-nc-nd/2.0/",
+  "url": "http://farm4.staticflickr.com/3214/2507093133_f75be3535a_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000025096.jpg",
+  "reviewed": false
+}

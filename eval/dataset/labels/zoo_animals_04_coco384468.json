@@ -1,0 +1,24 @@
+{
+  "image": "zoo_animals_04_coco384468.jpg",
+  "scene": "zoo_animals",
+  "expected": [
+    "car",
+    "elephant",
+    "person"
+  ],
+  "not_present": [
+    "truck",
+    "traffic light",
+    "bus",
+    "bag",
+    "motorcycle",
+    "backpack"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 384468",
+  "license": "Attribution-NonCommercial-ShareAlike License",
+  "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+  "url": "http://farm9.staticflickr.com/8199/8214226078_aa7d2ef265_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000384468.jpg",
+  "reviewed": false
+}

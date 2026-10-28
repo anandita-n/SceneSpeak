@@ -23,6 +23,7 @@ history) on top of this same function; Phase 3 adds symbol mapping.
 """
 
 import json
+import logging
 import os
 from functools import lru_cache
 
@@ -30,6 +31,8 @@ import google.generativeai as genai
 from PIL import Image
 from google.api_core import exceptions as google_exceptions
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger("scenespeak.vocab")
 
 # Google's "-latest" aliases always point at the current Flash models, so
 # they don't go stale the way pinned versions do (gemini-1.5-flash was
@@ -115,7 +118,7 @@ class GeminiBusyError(RuntimeError):
     """Every model we tried was overloaded or timed out."""
 
 
-def _generate(contents, api_key: str):
+def _generate(contents, api_key: str, temperature: float | None = None):
     """Try the preferred models in order, moving on when one is retired
     (404), overloaded (503), timed out, or out of quota for this key —
     a construction-time GenerativeModel() call never hits the API, so those
@@ -123,18 +126,23 @@ def _generate(contents, api_key: str):
     translated into messages a caregiver can act on, instead of a raw
     Google error."""
     genai.configure(api_key=api_key)
+    config = dict(_GENERATION_CONFIG)
+    if temperature is not None:
+        config["temperature"] = temperature
     errors = []
     try:
         for model_name in _PREFERRED_MODEL_NAMES:
             try:
-                return genai.GenerativeModel(model_name).generate_content(
-                    contents, generation_config=_GENERATION_CONFIG, request_options=_REQUEST_OPTIONS)
+                response = genai.GenerativeModel(model_name).generate_content(
+                    contents, generation_config=config, request_options=_REQUEST_OPTIONS)
+                logger.info("gemini model=%s", model_name)
+                return response
             except _TRY_NEXT_MODEL as exc:
                 errors.append(exc)
         if all(isinstance(e, google_exceptions.NotFound) for e in errors):
             model_name = _discover_model_name(api_key)
             return genai.GenerativeModel(model_name).generate_content(
-                contents, generation_config=_GENERATION_CONFIG, request_options=_REQUEST_OPTIONS)
+                contents, generation_config=config, request_options=_REQUEST_OPTIONS)
         quota_errors = [e for e in errors if isinstance(e, google_exceptions.ResourceExhausted)]
         if quota_errors:
             raise quota_errors[0]
@@ -157,7 +165,15 @@ def _build_prompt(
     scenario: str | None,
     retrieved_vocabulary: list[dict] | None = None,
     child_history: list[str] | None = None,
+    has_image: bool = True,
 ) -> str:
+    # The caption-only evaluation config sends no photo, so the prompt must
+    # not claim one is attached.
+    photo_line = (
+        "The\nphoto of the scene is attached — base your suggestions on what you can\nactually see in it."
+        if has_image else
+        "Only a\ntext description of the scene is available."
+    )
     context = f'Automatic caption of the photo (may miss details): "{caption}"'
     if scenario:
         context += f'\nActivity/context provided by the caregiver: "{scenario}"'
@@ -179,9 +195,8 @@ def _build_prompt(
     return f"""You support a speech-language pathologist building an AAC
 (Augmentative and Alternative Communication) topic display for a nonverbal
 or minimally-verbal child. Given the scene below, suggest vocabulary the
-child could use to talk about it during a language-learning activity. The
-photo of the scene is attached — base your suggestions on what you can
-actually see in it. The display will be arranged by part of speech in
+child could use to talk about it during a language-learning activity. {photo_line}
+The display will be arranged by part of speech in
 Fitzgerald Key order.
 
 {context}{grounding}
@@ -212,9 +227,13 @@ def generate_vocabulary(
     retrieved_vocabulary: list[dict] | None = None,
     child_history: list[str] | None = None,
     api_key: str | None = None,
+    temperature: float | None = None,
 ) -> VocabularySet:
+    """Generate the board's vocabulary. `image` is sent to Gemini alongside the
+    caption when given; `temperature` (e.g. 0 for repeatable evaluation)
+    defaults to the model's own setting."""
     resolved_key = _resolve_api_key(api_key)
-    prompt = _build_prompt(caption, scenario, retrieved_vocabulary, child_history)
+    prompt = _build_prompt(caption, scenario, retrieved_vocabulary, child_history, has_image=image is not None)
     contents = [prompt]
     if image is not None:
         image = image.copy()
@@ -224,7 +243,7 @@ def generate_vocabulary(
     # (observed ~1 in 50 calls during evaluation); one retry is far cheaper
     # than failing the caregiver's whole board.
     for attempt in range(2):
-        response = _generate(contents, resolved_key)
+        response = _generate(contents, resolved_key, temperature)
         try:
             return VocabularySet(**json.loads(_strip_fences(response.text)))
         except (json.JSONDecodeError, ValueError, TypeError):

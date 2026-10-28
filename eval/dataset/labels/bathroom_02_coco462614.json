@@ -1,0 +1,25 @@
+{
+  "image": "bathroom_02_coco462614.jpg",
+  "scene": "bathroom",
+  "expected": [
+    "chair",
+    "plant",
+    "sink",
+    "toilet"
+  ],
+  "not_present": [
+    "person",
+    "table",
+    "bottle",
+    "cup",
+    "bowl",
+    "vase"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 462614",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm5.staticflickr.com/4090/5042758991_26ec3d7fc1_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000462614.jpg",
+  "reviewed": false
+}

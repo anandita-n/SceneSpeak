@@ -1,0 +1,24 @@
+{
+  "image": "transport_02_coco138979.jpg",
+  "scene": "transport",
+  "expected": [
+    "bus",
+    "car",
+    "person"
+  ],
+  "not_present": [
+    "truck",
+    "traffic light",
+    "bag",
+    "motorcycle",
+    "backpack",
+    "bicycle"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 138979",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm9.staticflickr.com/8471/8149448889_244498909c_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000138979.jpg",
+  "reviewed": false
+}

@@ -1,0 +1,32 @@
+{
+  "image": "park_01_coco76547.jpg",
+  "scene": "park",
+  "expected": [
+    "backpack",
+    "bench",
+    "bicycle",
+    "chair",
+    "person",
+    "table",
+    "train"
+  ],
+  "not_present": [
+    "car",
+    "bag",
+    "truck",
+    "bus",
+    "bottle",
+    "umbrella"
+  ],
+  "ignore": [
+    "laptop",
+    "tie",
+    "traffic light"
+  ],
+  "source": "COCO val2017 image 76547",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm9.staticflickr.com/8557/8771723390_13dc9d18fa_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000076547.jpg",
+  "reviewed": false
+}

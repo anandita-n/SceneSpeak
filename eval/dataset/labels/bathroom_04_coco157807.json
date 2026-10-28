@@ -1,0 +1,24 @@
+{
+  "image": "bathroom_04_coco157807.jpg",
+  "scene": "bathroom",
+  "expected": [
+    "cat",
+    "sink",
+    "toilet"
+  ],
+  "not_present": [
+    "bottle",
+    "cup",
+    "person",
+    "oven",
+    "bowl",
+    "chair"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 157807",
+  "license": "Attribution-ShareAlike License",
+  "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+  "url": "http://farm5.staticflickr.com/4073/4770866338_a523fcc318_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000157807.jpg",
+  "reviewed": false
+}

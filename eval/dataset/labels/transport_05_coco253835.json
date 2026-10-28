@@ -1,0 +1,28 @@
+{
+  "image": "transport_05_coco253835.jpg",
+  "scene": "transport",
+  "expected": [
+    "backpack",
+    "person",
+    "train"
+  ],
+  "not_present": [
+    "car",
+    "bag",
+    "chair",
+    "truck",
+    "table",
+    "cup"
+  ],
+  "ignore": [
+    "bottle",
+    "clock",
+    "traffic light"
+  ],
+  "source": "COCO val2017 image 253835",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm4.staticflickr.com/3772/9683835627_634705b4c4_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000253835.jpg",
+  "reviewed": false
+}

@@ -1,0 +1,27 @@
+{
+  "image": "park_03_coco132796.jpg",
+  "scene": "park",
+  "expected": [
+    "bench",
+    "chair",
+    "elephant",
+    "person"
+  ],
+  "not_present": [
+    "bag",
+    "car",
+    "table",
+    "bicycle",
+    "suitcase",
+    "bottle"
+  ],
+  "ignore": [
+    "backpack"
+  ],
+  "source": "COCO val2017 image 132796",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm6.staticflickr.com/5130/5382853203_aa9df7df0e_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000132796.jpg",
+  "reviewed": false
+}

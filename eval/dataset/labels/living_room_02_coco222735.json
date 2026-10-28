@@ -1,0 +1,26 @@
+{
+  "image": "living_room_02_coco222735.jpg",
+  "scene": "living_room",
+  "expected": [
+    "TV",
+    "couch",
+    "person",
+    "remote control",
+    "table"
+  ],
+  "not_present": [
+    "chair",
+    "book",
+    "laptop",
+    "cup",
+    "bottle",
+    "plant"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 222735",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm4.staticflickr.com/3212/2749561795_4c25c5a576_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000222735.jpg",
+  "reviewed": false
+}

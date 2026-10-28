@@ -1,0 +1,24 @@
+{
+  "image": "zoo_animals_01_coco158945.jpg",
+  "scene": "zoo_animals",
+  "expected": [
+    "chair",
+    "elephant",
+    "person"
+  ],
+  "not_present": [
+    "table",
+    "cup",
+    "bottle",
+    "couch",
+    "book",
+    "TV"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 158945",
+  "license": "Attribution-ShareAlike License",
+  "license_url": "http://creativecommons.org/licenses/by-sa/2.0/",
+  "url": "http://farm5.staticflickr.com/4124/5072296382_e96d46c3cf_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000158945.jpg",
+  "reviewed": false
+}

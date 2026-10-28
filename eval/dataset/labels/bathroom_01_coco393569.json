@@ -1,0 +1,29 @@
+{
+  "image": "bathroom_01_coco393569.jpg",
+  "scene": "bathroom",
+  "expected": [
+    "backpack",
+    "bed",
+    "person",
+    "sink",
+    "toilet"
+  ],
+  "not_present": [
+    "chair",
+    "bag",
+    "cup",
+    "table",
+    "bowl",
+    "car"
+  ],
+  "ignore": [
+    "bottle",
+    "laptop"
+  ],
+  "source": "COCO val2017 image 393569",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm5.staticflickr.com/4014/4222801461_63b8674d2a_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000393569.jpg",
+  "reviewed": false
+}

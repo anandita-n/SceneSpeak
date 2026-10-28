@@ -1,0 +1,26 @@
+{
+  "image": "bathroom_03_coco571804.jpg",
+  "scene": "bathroom",
+  "expected": [
+    "bowl",
+    "sink",
+    "toilet"
+  ],
+  "not_present": [
+    "bottle",
+    "table",
+    "chair",
+    "person",
+    "cup",
+    "plant"
+  ],
+  "ignore": [
+    "vase"
+  ],
+  "source": "COCO val2017 image 571804",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm7.staticflickr.com/6075/6155496426_d035b57a3f_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000571804.jpg",
+  "reviewed": false
+}

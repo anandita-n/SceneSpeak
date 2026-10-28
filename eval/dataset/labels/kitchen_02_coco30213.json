@@ -1,0 +1,30 @@
+{
+  "image": "kitchen_02_coco30213.jpg",
+  "scene": "kitchen",
+  "expected": [
+    "chair",
+    "oven",
+    "refrigerator",
+    "sink",
+    "table"
+  ],
+  "not_present": [
+    "person",
+    "cup",
+    "knife",
+    "spoon",
+    "plant",
+    "vase"
+  ],
+  "ignore": [
+    "apple",
+    "bottle",
+    "bowl"
+  ],
+  "source": "COCO val2017 image 30213",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm9.staticflickr.com/8376/8561578295_08827d4611_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000030213.jpg",
+  "reviewed": false
+}

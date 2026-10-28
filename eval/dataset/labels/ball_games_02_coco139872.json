@@ -1,0 +1,24 @@
+{
+  "image": "ball_games_02_coco139872.jpg",
+  "scene": "ball_games",
+  "expected": [
+    "dog",
+    "frisbee",
+    "person"
+  ],
+  "not_present": [
+    "car",
+    "bench",
+    "bottle",
+    "truck",
+    "chair",
+    "backpack"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 139872",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm1.staticflickr.com/92/260183330_494bd996d8_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000139872.jpg",
+  "reviewed": false
+}

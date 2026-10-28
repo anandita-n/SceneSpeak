@@ -1,0 +1,26 @@
+{
+  "image": "zoo_animals_03_coco369037.jpg",
+  "scene": "zoo_animals",
+  "expected": [
+    "bag",
+    "elephant",
+    "person"
+  ],
+  "not_present": [
+    "backpack",
+    "chair",
+    "cup",
+    "table",
+    "car",
+    "umbrella"
+  ],
+  "ignore": [
+    "bottle"
+  ],
+  "source": "COCO val2017 image 369037",
+  "license": "Attribution-NonCommercial-ShareAlike License",
+  "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+  "url": "http://farm6.staticflickr.com/5164/5332388997_21be689fa9_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000369037.jpg",
+  "reviewed": false
+}

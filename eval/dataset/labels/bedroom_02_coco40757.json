@@ -1,0 +1,24 @@
+{
+  "image": "bedroom_02_coco40757.jpg",
+  "scene": "bedroom",
+  "expected": [
+    "TV",
+    "bed",
+    "person"
+  ],
+  "not_present": [
+    "chair",
+    "book",
+    "keyboard",
+    "couch",
+    "laptop",
+    "remote control"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 40757",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm5.staticflickr.com/4066/4705721976_a7c6bc8e97_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000040757.jpg",
+  "reviewed": false
+}

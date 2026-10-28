@@ -1,0 +1,26 @@
+{
+  "image": "ball_games_04_coco343218.jpg",
+  "scene": "ball_games",
+  "expected": [
+    "car",
+    "person",
+    "racket"
+  ],
+  "not_present": [
+    "chair",
+    "glove",
+    "bat",
+    "bench",
+    "backpack",
+    "truck"
+  ],
+  "ignore": [
+    "ball"
+  ],
+  "source": "COCO val2017 image 343218",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm4.staticflickr.com/3169/2653643649_665418b9df_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000343218.jpg",
+  "reviewed": false
+}

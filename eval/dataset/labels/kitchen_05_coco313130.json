@@ -1,0 +1,24 @@
+{
+  "image": "kitchen_05_coco313130.jpg",
+  "scene": "kitchen",
+  "expected": [
+    "chair",
+    "microwave",
+    "refrigerator"
+  ],
+  "not_present": [
+    "person",
+    "table",
+    "bottle",
+    "bowl",
+    "oven",
+    "cup"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 313130",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm5.staticflickr.com/4139/4930439332_ed665548e3_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000313130.jpg",
+  "reviewed": false
+}

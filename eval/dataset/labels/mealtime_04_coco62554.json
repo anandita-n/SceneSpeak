@@ -1,0 +1,26 @@
+{
+  "image": "mealtime_04_coco62554.jpg",
+  "scene": "mealtime",
+  "expected": [
+    "bowl",
+    "broccoli",
+    "table"
+  ],
+  "not_present": [
+    "knife",
+    "person",
+    "cup",
+    "chair",
+    "bottle",
+    "spoon"
+  ],
+  "ignore": [
+    "fork"
+  ],
+  "source": "COCO val2017 image 62554",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm6.staticflickr.com/5021/5560942229_40538af5b5_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000062554.jpg",
+  "reviewed": false
+}

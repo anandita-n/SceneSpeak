@@ -1,0 +1,29 @@
+{
+  "image": "mealtime_01_coco20553.jpg",
+  "scene": "mealtime",
+  "expected": [
+    "chair",
+    "table",
+    "teddy bear",
+    "umbrella"
+  ],
+  "not_present": [
+    "person",
+    "bowl",
+    "knife",
+    "plant",
+    "sink",
+    "book"
+  ],
+  "ignore": [
+    "bottle",
+    "cup",
+    "vase"
+  ],
+  "source": "COCO val2017 image 20553",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm4.staticflickr.com/3288/2926009969_406b0b7654_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000020553.jpg",
+  "reviewed": false
+}

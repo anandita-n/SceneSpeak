@@ -1,0 +1,24 @@
+{
+  "image": "zoo_animals_02_coco267169.jpg",
+  "scene": "zoo_animals",
+  "expected": [
+    "bottle",
+    "elephant",
+    "person"
+  ],
+  "not_present": [
+    "cup",
+    "table",
+    "chair",
+    "bowl",
+    "sink",
+    "knife"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 267169",
+  "license": "Attribution-NoDerivs License",
+  "license_url": "http://creativecommons.org/licenses/by-nd/2.0/",
+  "url": "http://farm8.staticflickr.com/7228/7362215638_f395e68601_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000267169.jpg",
+  "reviewed": false
+}

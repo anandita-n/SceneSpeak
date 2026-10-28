@@ -1,0 +1,26 @@
+{
+  "image": "ball_games_03_coco239773.jpg",
+  "scene": "ball_games",
+  "expected": [
+    "bat",
+    "glove",
+    "person"
+  ],
+  "not_present": [
+    "racket",
+    "chair",
+    "bench",
+    "car",
+    "bottle",
+    "backpack"
+  ],
+  "ignore": [
+    "ball"
+  ],
+  "source": "COCO val2017 image 239773",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm3.staticflickr.com/2458/3883298746_df92113101_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000239773.jpg",
+  "reviewed": false
+}

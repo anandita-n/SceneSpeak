@@ -1,0 +1,26 @@
+{
+  "image": "bathroom_05_coco68078.jpg",
+  "scene": "bathroom",
+  "expected": [
+    "dog",
+    "sink",
+    "toilet"
+  ],
+  "not_present": [
+    "person",
+    "cup",
+    "table",
+    "bowl",
+    "chair",
+    "oven"
+  ],
+  "ignore": [
+    "bottle"
+  ],
+  "source": "COCO val2017 image 68078",
+  "license": "Attribution-NonCommercial-ShareAlike License",
+  "license_url": "http://creativecommons.org/licenses/by-nc-sa/2.0/",
+  "url": "http://farm5.staticflickr.com/4017/4331592297_aa22c03ebe_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000068078.jpg",
+  "reviewed": false
+}

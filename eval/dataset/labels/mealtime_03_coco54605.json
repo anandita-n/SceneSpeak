@@ -1,0 +1,28 @@
+{
+  "image": "mealtime_03_coco54605.jpg",
+  "scene": "mealtime",
+  "expected": [
+    "cake",
+    "chair",
+    "cup",
+    "person",
+    "table"
+  ],
+  "not_present": [
+    "knife",
+    "bowl",
+    "bottle",
+    "spoon",
+    "pizza",
+    "glass"
+  ],
+  "ignore": [
+    "fork"
+  ],
+  "source": "COCO val2017 image 54605",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm9.staticflickr.com/8396/8645114496_3c5bd1615f_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000054605.jpg",
+  "reviewed": false
+}

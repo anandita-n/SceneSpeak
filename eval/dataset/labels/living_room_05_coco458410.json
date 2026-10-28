@@ -1,0 +1,27 @@
+{
+  "image": "living_room_05_coco458410.jpg",
+  "scene": "living_room",
+  "expected": [
+    "TV",
+    "couch",
+    "table"
+  ],
+  "not_present": [
+    "person",
+    "chair",
+    "cup",
+    "bottle",
+    "bowl",
+    "knife"
+  ],
+  "ignore": [
+    "book",
+    "glass"
+  ],
+  "source": "COCO val2017 image 458410",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm5.staticflickr.com/4009/4586518760_6b3d02f30f_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000458410.jpg",
+  "reviewed": false
+}

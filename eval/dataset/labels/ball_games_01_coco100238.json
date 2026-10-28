@@ -1,0 +1,26 @@
+{
+  "image": "ball_games_01_coco100238.jpg",
+  "scene": "ball_games",
+  "expected": [
+    "bag",
+    "frisbee",
+    "person"
+  ],
+  "not_present": [
+    "car",
+    "backpack",
+    "chair",
+    "table",
+    "cup",
+    "dog"
+  ],
+  "ignore": [
+    "bottle"
+  ],
+  "source": "COCO val2017 image 100238",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm4.staticflickr.com/3192/5846630152_e082bbc6ea_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000100238.jpg",
+  "reviewed": false
+}

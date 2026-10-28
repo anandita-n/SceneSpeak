@@ -1,0 +1,28 @@
+{
+  "image": "pets_01_coco119233.jpg",
+  "scene": "pets",
+  "expected": [
+    "bird",
+    "cat",
+    "cup",
+    "laptop"
+  ],
+  "not_present": [
+    "person",
+    "table",
+    "bowl",
+    "bottle",
+    "chair",
+    "knife"
+  ],
+  "ignore": [
+    "phone",
+    "spoon"
+  ],
+  "source": "COCO val2017 image 119233",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm3.staticflickr.com/2248/2050977429_aff593ecc2_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000119233.jpg",
+  "reviewed": false
+}

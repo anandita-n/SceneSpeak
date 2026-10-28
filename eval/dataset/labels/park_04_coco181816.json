@@ -1,0 +1,25 @@
+{
+  "image": "park_04_coco181816.jpg",
+  "scene": "park",
+  "expected": [
+    "bench",
+    "car",
+    "person",
+    "plant"
+  ],
+  "not_present": [
+    "chair",
+    "table",
+    "truck",
+    "vase",
+    "bag",
+    "bottle"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 181816",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm9.staticflickr.com/8031/7978704233_c38f174e37_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000181816.jpg",
+  "reviewed": false
+}

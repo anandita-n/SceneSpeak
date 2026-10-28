@@ -1,0 +1,26 @@
+{
+  "image": "pets_02_coco177015.jpg",
+  "scene": "pets",
+  "expected": [
+    "cat",
+    "couch",
+    "laptop",
+    "person",
+    "refrigerator"
+  ],
+  "not_present": [
+    "chair",
+    "bottle",
+    "TV",
+    "book",
+    "table",
+    "cup"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 177015",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm1.staticflickr.com/131/355302776_1d1215b7c1_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000177015.jpg",
+  "reviewed": false
+}

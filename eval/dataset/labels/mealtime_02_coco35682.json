@@ -1,0 +1,28 @@
+{
+  "image": "mealtime_02_coco35682.jpg",
+  "scene": "mealtime",
+  "expected": [
+    "bag",
+    "cake",
+    "chair",
+    "cup",
+    "donut",
+    "person",
+    "table"
+  ],
+  "not_present": [
+    "backpack",
+    "bottle",
+    "bowl",
+    "car",
+    "umbrella",
+    "knife"
+  ],
+  "ignore": [],
+  "source": "COCO val2017 image 35682",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm5.staticflickr.com/4062/4666441455_b9bac3570c_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000035682.jpg",
+  "reviewed": false
+}

@@ -1,0 +1,27 @@
+{
+  "image": "pets_03_coco198641.jpg",
+  "scene": "pets",
+  "expected": [
+    "TV",
+    "cat",
+    "keyboard",
+    "laptop"
+  ],
+  "not_present": [
+    "person",
+    "chair",
+    "computer mouse",
+    "book",
+    "cup",
+    "bottle"
+  ],
+  "ignore": [
+    "clock"
+  ],
+  "source": "COCO val2017 image 198641",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm5.staticflickr.com/4062/4346863707_0e5e93cea4_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000198641.jpg",
+  "reviewed": false
+}

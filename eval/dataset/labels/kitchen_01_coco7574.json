@@ -1,0 +1,30 @@
+{
+  "image": "kitchen_01_coco7574.jpg",
+  "scene": "kitchen",
+  "expected": [
+    "microwave",
+    "oven",
+    "refrigerator",
+    "sink"
+  ],
+  "not_present": [
+    "person",
+    "table",
+    "cup",
+    "chair",
+    "knife",
+    "spoon"
+  ],
+  "ignore": [
+    "bottle",
+    "bowl",
+    "glass",
+    "vase"
+  ],
+  "source": "COCO val2017 image 7574",
+  "license": "Attribution License",
+  "license_url": "http://creativecommons.org/licenses/by/2.0/",
+  "url": "http://farm8.staticflickr.com/7054/6924897347_7266fd119c_z.jpg",
+  "coco_url": "http://images.cocodataset.org/val2017/000000007574.jpg",
+  "reviewed": false
+}
